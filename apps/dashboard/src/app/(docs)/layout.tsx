@@ -1,4 +1,8 @@
+"use client"
+
 import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 const nav = [
   {
@@ -38,61 +42,70 @@ const nav = [
 ]
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+
   return (
-    <div style={{ minHeight: "100vh", background: "hsl(0 0% 3.9%)", display: "flex", flexDirection: "column" }}>
-      {/* Nav */}
-      <nav style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(10,10,10,0.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 24px", height: "60px", display: "flex", alignItems: "center", gap: "32px" }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
-            <span style={{ fontSize: "20px" }}>⚡</span>
-            <span style={{ fontWeight: 700, color: "white" }}>AI Gateway</span>
+    <div className="min-h-screen bg-background flex flex-col font-sans">
+      {/* Top Nav */}
+      <nav className="h-14 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-50 flex items-center px-6">
+        <div className="max-w-[1400px] w-full mx-auto flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2 font-bold text-foreground">
+            <span className="text-primary text-lg">⚡</span>
+            <span>AI Gateway</span>
           </Link>
-          <span style={{ color: "rgba(255,255,255,0.3)" }}>/</span>
-          <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px" }}>Docs</span>
+          <span className="text-muted-foreground/30">/</span>
+          <span className="text-muted-foreground text-sm font-medium">Documentation</span>
         </div>
       </nav>
 
-      <div style={{ display: "flex", flex: 1, maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
-        {/* Sidebar */}
-        <aside style={{ width: "240px", flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.06)", padding: "32px 0", position: "sticky", top: "60px", height: "calc(100vh - 60px)", overflowY: "auto" }}>
+      <div className="flex flex-1 max-w-[1400px] mx-auto w-full">
+        {/* Left Sidebar */}
+        <aside className="w-[240px] shrink-0 border-r border-border py-8 hidden md:block sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto hidden-scrollbar">
           {nav.map((section) => (
-            <div key={section.title} style={{ marginBottom: "28px", padding: "0 16px" }}>
-              <div style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.35)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", padding: "0 8px" }}>
+            <div key={section.title} className="mb-8 px-4">
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
                 {section.title}
+              </h4>
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "block px-3 py-1.5 rounded-md text-sm transition-colors",
+                        isActive 
+                          ? "bg-secondary text-foreground font-medium" 
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      )}
+                    >
+                      {item.title}
+                    </Link>
+                  )
+                })}
               </div>
-              {section.items.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  style={{
-                    display: "block",
-                    padding: "7px 8px",
-                    borderRadius: "6px",
-                    color: "rgba(255,255,255,0.6)",
-                    textDecoration: "none",
-                    fontSize: "14px",
-                    transition: "color 0.15s, background 0.15s",
-                  }}
-                >
-                  {item.title}
-                </Link>
-              ))}
             </div>
           ))}
         </aside>
 
-        {/* Content */}
-        <main style={{ flex: 1, padding: "48px 64px", minWidth: 0, maxWidth: "760px" }}>
-          <div
-            style={{
-              color: "rgba(255,255,255,0.85)",
-              lineHeight: 1.75,
-              fontSize: "16px",
-            }}
-          >
+        {/* Dynamic Prose Content */}
+        <main className="flex-1 min-w-0 py-10 px-6 md:px-12 lg:px-16 overflow-x-hidden">
+          <div className="prose prose-invert prose-zinc max-w-3xl prose-pre:bg-transparent prose-pre:p-0">
             {children}
           </div>
         </main>
+
+        {/* Right TOC Placeholder (Optional styling) */}
+        <aside className="w-[200px] shrink-0 py-10 px-4 hidden xl:block sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">On this page</div>
+          <div className="space-y-2 text-sm text-muted-foreground/80">
+            <p className="hover:text-foreground cursor-pointer transition-colors">Overview</p>
+            <p className="hover:text-foreground cursor-pointer transition-colors">Architecture</p>
+            <p className="hover:text-foreground cursor-pointer transition-colors">Supported Models</p>
+            <p className="hover:text-foreground cursor-pointer transition-colors">Tech Stack</p>
+          </div>
+        </aside>
       </div>
     </div>
   )

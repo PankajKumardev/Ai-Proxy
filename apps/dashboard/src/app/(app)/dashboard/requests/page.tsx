@@ -1,6 +1,19 @@
 import { auth } from "@/auth"
 import { PrismaClient } from "@prisma/client"
+import Link from "next/link"
 import type { Metadata } from "next"
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight, Activity, Code2, Copy } from "lucide-react"
 
 export const metadata: Metadata = { title: "Requests — AI Gateway Dashboard" }
 const prisma = new PrismaClient()
@@ -36,128 +49,150 @@ export default async function RequestsPage({
     : null
 
   return (
-    <div>
-      <div style={{ marginBottom: "32px" }}>
-        <h1 style={{ fontSize: "28px", fontWeight: 800, color: "white", marginBottom: "4px" }}>Requests</h1>
-        <p style={{ color: "rgba(255,255,255,0.5)" }}>Inspect and replay individual requests</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Requests</h1>
+        <p className="text-sm text-muted-foreground mt-1">Inspect and replay individual requests across your providers.</p>
       </div>
 
-      {/* Detail panel */}
       {detail && (
-        <div
-          style={{
-            background: "rgba(168,85,247,0.05)",
-            border: "1px solid rgba(168,85,247,0.2)",
-            borderRadius: "14px",
-            padding: "24px",
-            marginBottom: "28px",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
-            <div>
-              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", marginBottom: "4px" }}>Request ID</div>
-              <code style={{ fontFamily: "monospace", color: "#a855f7", fontSize: "14px" }}>{detail.requestId}</code>
-            </div>
-            <div style={{ display: "flex", gap: "16px" }}>
-              {[
-                { label: "Provider", value: detail.provider },
-                { label: "Model", value: detail.model },
-                { label: "Latency", value: `${detail.latencyMs}ms` },
-                { label: "Cost", value: `$${detail.cost.toFixed(4)}` },
-              ].map((m) => (
-                <div key={m.label} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", marginBottom: "4px" }}>{m.label}</div>
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "white", textTransform: "capitalize" }}>{m.value}</div>
+        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-border pb-6 mb-6">
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Request ID</p>
+                <div className="flex items-center gap-2">
+                  <code className="bg-muted px-2 py-1 rounded text-sm font-mono text-foreground border border-border/50">
+                    {detail.requestId}
+                  </code>
                 </div>
-              ))}
+              </div>
+              <div className="flex flex-wrap gap-8 md:gap-12">
+                {[
+                  { label: "Provider", value: detail.provider },
+                  { label: "Model", value: detail.model },
+                  { label: "Latency", value: `${detail.latencyMs}ms` },
+                  { label: "Cost", value: `$${detail.cost.toFixed(4)}` },
+                ].map((m) => (
+                  <div key={m.label}>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{m.label}</p>
+                    <p className="text-base font-semibold text-foreground capitalize">{m.value}</p>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {detail.promptJson ? (
+              <div className="grid lg:grid-cols-2 gap-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Code2 className="w-4 h-4 text-muted-foreground" />
+                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Prompt Payload</h3>
+                  </div>
+                  <pre className="mt-2 w-full rounded-md bg-black border border-border/50 p-4 text-sm font-mono text-muted-foreground overflow-auto max-h-[300px] shadow-inner">
+                    {JSON.stringify(JSON.parse(detail.promptJson), null, 2)}
+                  </pre>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Activity className="w-4 h-4 text-muted-foreground" />
+                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Response JSON</h3>
+                  </div>
+                  <pre className="mt-2 w-full rounded-md bg-black border border-border/50 p-4 text-sm font-mono text-muted-foreground overflow-auto max-h-[300px] shadow-inner">
+                    {detail.responseJson ? JSON.stringify(JSON.parse(detail.responseJson), null, 2) : "// Content not stored for this request"}
+                  </pre>
+                </div>
+              </div>
+            ) : (
+              <div className="py-8 text-center bg-muted/20 border border-border border-dashed rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  Prompt content not stored. Enable "Store request content" in Settings to log payloads.
+                </p>
+              </div>
+            )}
           </div>
-          {detail.promptJson && (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-              <div>
-                <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>Prompt</div>
-                <pre style={{ background: "rgba(0,0,0,0.3)", borderRadius: "8px", padding: "14px", color: "rgba(255,255,255,0.75)", fontSize: "12px", lineHeight: 1.6, overflow: "auto", maxHeight: "200px" }}>
-                  {JSON.stringify(JSON.parse(detail.promptJson), null, 2)}
-                </pre>
-              </div>
-              <div>
-                <div style={{ fontSize: "12px", fontWeight: 700, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>Response</div>
-                <pre style={{ background: "rgba(0,0,0,0.3)", borderRadius: "8px", padding: "14px", color: "rgba(255,255,255,0.75)", fontSize: "12px", lineHeight: 1.6, overflow: "auto", maxHeight: "200px" }}>
-                  {detail.responseJson ? JSON.stringify(JSON.parse(detail.responseJson), null, 2) : "(not stored)"}
-                </pre>
-              </div>
-            </div>
-          )}
-          {!detail.promptJson && (
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
-              Prompt content not stored. Enable &quot;Store request content&quot; in Settings to log prompts.
-            </p>
-          )}
         </div>
       )}
 
-      {/* Requests table */}
-      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", overflow: "hidden" }}>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                {["Request ID", "Provider", "Model", "Latency", "Tokens", "Cost", "Cache", "Time", ""].map((h) => (
-                  <th key={h} style={{ padding: "12px 14px", textAlign: "left", color: "rgba(255,255,255,0.4)", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((r) => (
-                <tr key={r.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
-                  <td style={{ padding: "12px 14px" }}>
-                    <code style={{ fontFamily: "monospace", fontSize: "12px", color: "rgba(255,255,255,0.5)" }}>{r.requestId}</code>
-                  </td>
-                  <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.8)", textTransform: "capitalize", fontWeight: 600 }}>{r.provider}</td>
-                  <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.6)" }}>{r.model}</td>
-                  <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.6)" }}>{r.latencyMs}ms</td>
-                  <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.6)" }}>{r.tokens.toLocaleString()}</td>
-                  <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.6)" }}>${r.cost.toFixed(4)}</td>
-                  <td style={{ padding: "12px 14px" }}>
-                    <span style={{ background: r.cacheHit ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.12)", color: r.cacheHit ? "#10b981" : "#ef4444", padding: "2px 6px", borderRadius: "100px", fontSize: "10px", fontWeight: 700 }}>
-                      {r.cacheHit ? "HIT" : "MISS"}
-                    </span>
-                  </td>
-                  <td style={{ padding: "12px 14px", color: "rgba(255,255,255,0.35)", fontSize: "11px", whiteSpace: "nowrap" }}>
-                    {new Date(r.timestamp).toLocaleString()}
-                  </td>
-                  <td style={{ padding: "12px 14px" }}>
-                    <a
-                      href={`/dashboard/requests?id=${r.id}`}
-                      style={{
-                        color: "#a855f7",
-                        textDecoration: "none",
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        padding: "4px 10px",
-                        background: "rgba(168,85,247,0.1)",
-                        borderRadius: "6px",
-                        border: "1px solid rgba(168,85,247,0.2)",
-                      }}
-                    >
-                      View
-                    </a>
-                  </td>
-                </tr>
-              ))}
-              {requests.length === 0 && (
-                <tr><td colSpan={9} style={{ padding: "48px", textAlign: "center", color: "rgba(255,255,255,0.3)" }}>No requests yet.</td></tr>
+      {/* Requests Table */}
+      <div className="rounded-md border bg-card text-card-foreground shadow-sm">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead className="w-[180px]">REQUEST ID</TableHead>
+                <TableHead>PROVIDER</TableHead>
+                <TableHead>MODEL</TableHead>
+                <TableHead>LATENCY</TableHead>
+                <TableHead>TOKENS</TableHead>
+                <TableHead>COST</TableHead>
+                <TableHead>CACHE</TableHead>
+                <TableHead>TIME</TableHead>
+                <TableHead className="text-right">ACTIONS</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {requests.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={9} className="h-32 text-center text-muted-foreground">
+                    No requests recorded yet. Data will appear here once you start using the proxy.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                requests.map((r) => (
+                  <TableRow key={r.id} className="group transition-colors data-[state=selected]:bg-muted">
+                    <TableCell>
+                      <code className="text-xs font-mono text-muted-foreground hidden sm:inline-block">
+                        {r.requestId.split('-')[0]}...
+                      </code>
+                      <code className="text-xs font-mono text-muted-foreground sm:hidden inline-block truncate w-24">
+                        {r.requestId}
+                      </code>
+                    </TableCell>
+                    <TableCell className="font-medium capitalize">{r.provider}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{r.model}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{r.latencyMs}ms</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{r.tokens.toLocaleString()}</TableCell>
+                    <TableCell className="text-muted-foreground text-sm">${r.cost.toFixed(4)}</TableCell>
+                    <TableCell>
+                      <Badge variant={r.cacheHit ? "default" : "secondary"} className={r.cacheHit ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-emerald-500/20" : "text-muted-foreground"}>
+                        {r.cacheHit ? "HIT" : "MISS"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs whitespace-nowrap">
+                      {new Date(r.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Link href={`/dashboard/requests?page=${page}&id=${r.id}`} className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-muted text-muted-foreground hover:text-foreground h-8 px-3 border border-border/50 bg-background/50 outline-none focus-visible:ring-1">
+                        View
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
-        {/* Pagination */}
+        
+        {/* Pagination Footer */}
         {totalPages > 1 && (
-          <div style={{ padding: "16px 20px", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>Showing {skip + 1}–{Math.min(skip + PAGE_SIZE, total)} of {total.toLocaleString()}</span>
-            <div style={{ display: "flex", gap: "8px" }}>
-              {page > 1 && <a href={`/dashboard/requests?page=${page - 1}`} style={{ color: "#a855f7", textDecoration: "none", fontSize: "13px", fontWeight: 600 }}>← Prev</a>}
-              {page < totalPages && <a href={`/dashboard/requests?page=${page + 1}`} style={{ color: "#a855f7", textDecoration: "none", fontSize: "13px", fontWeight: 600 }}>Next →</a>}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-border">
+            <span className="text-sm text-muted-foreground">
+              Showing {skip + 1} to {Math.min(skip + PAGE_SIZE, total)} of <span className="font-medium text-foreground">{total.toLocaleString()}</span> entries
+            </span>
+            <div className="flex gap-2">
+              <Link 
+                href={page > 1 ? `/dashboard/requests?page=${page - 1}` : "#"}
+                className={`inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-border h-8 px-3 ${page <= 1 ? "pointer-events-none opacity-50 bg-muted/50" : "bg-transparent hover:bg-muted"}`}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+              </Link>
+              <Link 
+                href={page < totalPages ? `/dashboard/requests?page=${page + 1}` : "#"}
+                className={`inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-border h-8 px-3 ${page >= totalPages ? "pointer-events-none opacity-50 bg-muted/50" : "bg-transparent hover:bg-muted"}`}
+              >
+                Next <ChevronRight className="w-4 h-4 ml-1" />
+              </Link>
             </div>
           </div>
         )}

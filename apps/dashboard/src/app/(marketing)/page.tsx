@@ -31,14 +31,14 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative pt-32 pb-20 px-6 max-w-6xl mx-auto text-center">
         {/* Glow blob */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary/20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/30 to-transparent blur-[80px] -z-10 rounded-full pointer-events-none" />
+        <div className="hero-glow" />
 
         <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary mb-8 shadow-[0_0_20px_rgba(168,85,247,0.2)]">
           <span className="mr-2">✨</span> Open-source & self-hostable
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-8 text-white">
-          Stop paying for <span className="text-gradient">duplicate AI calls</span>
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-8 text-white mt-12">
+          Stop paying for <span className="text-primary/90">duplicate AI calls</span>
         </h1>
         
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
@@ -46,10 +46,10 @@ export default function HomePage() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Link href="/signup" className="inline-flex items-center justify-center shrink-0 whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-base h-14 px-8 py-2 rounded-full shadow-[0_0_40px_rgba(168,85,247,0.4)] bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 border-none font-bold text-white">
+          <Link href="/signup" className="inline-flex items-center justify-center shrink-0 whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-base h-12 px-8 rounded-full shadow-[0_4px_14px_0_rgba(255,255,255,0.2)] bg-foreground text-background hover:bg-foreground/90 font-semibold">
             Get Started Free <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
-          <Link href="/docs/introduction" className="inline-flex items-center justify-center shrink-0 whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-base h-14 px-8 py-2 rounded-full font-semibold border border-white/10 hover:bg-white/5 text-white bg-transparent">
+          <Link href="/docs/introduction" className="inline-flex items-center justify-center shrink-0 whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 text-base h-12 px-8 rounded-full font-semibold border border-border hover:bg-secondary text-foreground bg-black">
             View Docs
           </Link>
         </div>
@@ -164,7 +164,12 @@ export default function HomePage() {
           ].map((plan) => (
             <div
               key={plan.name}
-              className={"relative flex flex-col p-8 rounded-3xl border transition-all duration-300 " + (plan.featured ? "bg-gradient-to-b from-primary/10 to-transparent border-primary/50 shadow-[0_0_40px_rgba(168,85,247,0.15)] md:-mt-8 md:mb-8" : "bg-white/5 border-white/10")}
+              className={cn(
+                "relative flex flex-col p-8 rounded-[18px] transition-all duration-300", 
+                plan.featured 
+                  ? "bg-black border border-primary/30 glow-accent shadow-[0_0_80px_rgba(255,255,255,0.03)] md:-mt-8 md:mb-8" 
+                  : "bg-black border border-border"
+              )}
             >
               {plan.featured && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">

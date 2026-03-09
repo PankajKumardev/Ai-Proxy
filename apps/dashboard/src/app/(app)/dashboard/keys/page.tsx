@@ -4,6 +4,18 @@ import { redirect } from "next/navigation"
 import crypto from "crypto"
 import type { Metadata } from "next"
 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Copy, Plus, Trash2, Key } from "lucide-react"
+
 export const metadata: Metadata = { title: "API Keys — AI Gateway Dashboard" }
 const prisma = new PrismaClient()
 
@@ -18,7 +30,6 @@ async function createKey(formData: FormData) {
   const keyHash = crypto.createHash("sha256").update(raw).digest("hex")
   await prisma.apiKey.create({ data: { keyHash, userId, name } })
 
-  // Redirect with the raw key in the query string (shown once, then gone)
   redirect(`/dashboard/keys?new=${encodeURIComponent(raw)}`)
 }
 
@@ -47,133 +58,89 @@ export default async function KeysPage({
   })
 
   return (
-    <div>
-      <div style={{ marginBottom: "32px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 style={{ fontSize: "28px", fontWeight: 800, color: "white", marginBottom: "4px" }}>API Keys</h1>
-          <p style={{ color: "rgba(255,255,255,0.5)" }}>Manage your gateway access keys</p>
+          <h1 className="text-2xl font-bold tracking-tight">API Keys</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage your gateway access keys for authenticating API requests.</p>
         </div>
-        <form action={createKey} style={{ display: "flex", gap: "10px" }}>
-          <input
-            name="name"
-            placeholder="Key name (optional)"
-            style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "8px",
-              padding: "10px 14px",
-              color: "white",
-              fontSize: "14px",
-              outline: "none",
-            }}
+        
+        <form action={createKey} className="flex flex-col sm:flex-row gap-3">
+          <Input 
+            name="name" 
+            placeholder="Key name (e.g., Production)" 
+            className="w-full sm:w-[250px] bg-background"
           />
-          <button
-            type="submit"
-            style={{
-              background: "linear-gradient(135deg, #a855f7, #3b82f6)",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              padding: "10px 20px",
-              fontSize: "14px",
-              fontWeight: 700,
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-          >
-            + Create New Key
-          </button>
+          <Button type="submit" className="gap-2 shrink-0">
+            <Plus className="w-4 h-4" /> Create new key
+          </Button>
         </form>
       </div>
 
-      {/* Show new key (one time only) */}
       {newKey && (
-        <div
-          style={{
-            background: "rgba(16,185,129,0.08)",
-            border: "1px solid rgba(16,185,129,0.3)",
-            borderRadius: "12px",
-            padding: "20px 24px",
-            marginBottom: "28px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-            <span style={{ fontSize: "16px" }}>🔑</span>
-            <strong style={{ color: "#10b981", fontSize: "15px" }}>Your new API key</strong>
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-5 shadow-sm space-y-3">
+          <div className="flex items-center gap-2 text-emerald-500">
+            <Key className="w-5 h-5" />
+            <h3 className="font-semibold">Your new API key</h3>
           </div>
-          <code
-            style={{
-              display: "block",
-              fontFamily: "monospace",
-              fontSize: "14px",
-              color: "white",
-              background: "rgba(0,0,0,0.3)",
-              padding: "12px 16px",
-              borderRadius: "8px",
-              wordBreak: "break-all",
-              marginBottom: "12px",
-            }}
-          >
-            {newKey}
-          </code>
-          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", margin: 0 }}>
-            ⚠️ This key will only be shown once. Copy and store it in a safe place now.
+          <p className="text-sm text-muted-foreground">
+            Please copy this key and store it securely. For security reasons, <strong className="text-foreground">it will never be shown again</strong>.
           </p>
+          <div className="relative group">
+            <code className="block w-full rounded-md bg-black/50 p-4 text-sm font-mono text-emerald-400 break-all border border-emerald-500/20 shadow-inner">
+              {newKey}
+            </code>
+          </div>
         </div>
       )}
 
-      {/* Keys table */}
-      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", overflow: "hidden" }}>
-        {keys.length === 0 ? (
-          <div style={{ padding: "64px", textAlign: "center", color: "rgba(255,255,255,0.3)" }}>
-            No API keys yet. Create your first key to start using the gateway.
-          </div>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                {["Name", "Key (masked)", "Created", "Actions"].map((h) => (
-                  <th key={h} style={{ padding: "14px 20px", textAlign: "left", color: "rgba(255,255,255,0.4)", fontWeight: 600, fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.5px" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {keys.map((key) => (
-                <tr key={key.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                  <td style={{ padding: "14px 20px", color: "white", fontWeight: 600 }}>{key.name}</td>
-                  <td style={{ padding: "14px 20px" }}>
-                    <code style={{ fontFamily: "monospace", fontSize: "13px", color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.05)", padding: "4px 8px", borderRadius: "4px" }}>
+      <div className="rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50 hover:bg-muted/50">
+              <TableHead>NAME</TableHead>
+              <TableHead>KEY HASH</TableHead>
+              <TableHead>CREATED</TableHead>
+              <TableHead className="text-right">ACTIONS</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {keys.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                  No API keys generated yet. Create one to get started.
+                </TableCell>
+              </TableRow>
+            ) : (
+              keys.map((key) => (
+                <TableRow key={key.id} className="group transition-colors">
+                  <TableCell className="font-medium">{key.name}</TableCell>
+                  <TableCell>
+                    <code className="rounded bg-muted px-2 py-1 font-mono text-xs text-muted-foreground group-hover:text-foreground transition-colors border border-border/50">
                       sk-gw-••••••••{key.keyHash.slice(-8)}
                     </code>
-                  </td>
-                  <td style={{ padding: "14px 20px", color: "rgba(255,255,255,0.5)", fontSize: "13px" }}>
-                    {new Date(key.createdAt).toLocaleDateString()}
-                  </td>
-                  <td style={{ padding: "14px 20px" }}>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-sm">
+                    {new Date(key.createdAt).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </TableCell>
+                  <TableCell className="text-right">
                     <form action={deleteKey}>
                       <input type="hidden" name="keyId" value={key.id} />
-                      <button
-                        type="submit"
-                        style={{
-                          background: "rgba(239,68,68,0.1)",
-                          color: "#ef4444",
-                          border: "1px solid rgba(239,68,68,0.2)",
-                          borderRadius: "6px",
-                          padding: "6px 14px",
-                          fontSize: "13px",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        Delete
-                      </button>
+                      <Button type="submit" variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                        <Trash2 className="w-4 h-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
                     </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
   )
