@@ -1,6 +1,7 @@
 import Link from "next/link"
 import type { Metadata } from "next"
 import { Check, X } from "lucide-react"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 export const metadata: Metadata = {
   title: "Pricing — AI Gateway",
@@ -166,17 +167,18 @@ export default function PricingPage() {
       {/* FAQ */}
       <div className="max-w-3xl mx-auto">
         <h2 className="text-3xl font-medium tracking-tighter text-white text-center mb-10">Frequently Asked Questions</h2>
-        <div className="space-y-4">
-          {faqs.map((faq) => (
-            <div
-              key={faq.q}
-              className="bg-[#111111] border border-white/10 rounded-xl p-6 hover:bg-[#161616] transition-colors"
-            >
-              <h3 className="text-base font-medium text-white mb-2">{faq.q}</h3>
-              <p className="text-[#a3a3a3] text-sm leading-relaxed m-0">{faq.a}</p>
-            </div>
+        <Accordion className="w-full">
+          {faqs.map((faq, i) => (
+            <AccordionItem key={i} value={`item-${i}`} className="bg-[#111111] border-x border-t border-b border-white/10 rounded-2xl px-6 sm:px-8 mb-4 hover:bg-[#161616] transition-colors data-[open]:bg-[#161616] tracking-tight group/item">
+              <AccordionTrigger className="group flex flex-1 w-full items-center justify-between text-left text-base sm:text-lg font-medium text-white hover:no-underline py-6">
+                {faq.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-[#a3a3a3] text-[14px] sm:text-[15px] leading-relaxed pb-6 text-left">
+                {faq.a}
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </div>
+        </Accordion>
       </div>
     </div>
   )

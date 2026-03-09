@@ -1,8 +1,8 @@
-// apps/dashboard/src/app/(marketing)/page.tsx
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight, Database, Server, Split, Code, Activity, ShieldCheck, Star, Box, Compass, CloudLightning, RefreshCw, Layers, Check, X } from "lucide-react";
+import { ArrowRight, Database, Server, Split, Code, Activity, ShieldCheck, Box, Compass, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 export const metadata: Metadata = {
   title: "AI Gateway — Open-source LLM Proxy with Caching & Fallback Routing",
@@ -26,7 +26,6 @@ const res = await openai.chat.completions.create({
 export default function HomePage() {
   return (
     <>
-
       {/* Hero */}
       <section className="relative pt-40 pb-20 px-6 max-w-6xl mx-auto text-center">
         <div className="inline-flex items-center rounded-full border border-white/10 bg-transparent px-4 py-1.5 text-sm font-medium text-[#d4d4d4] mb-8">
@@ -71,11 +70,95 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Trust & Performance Bar */}
+      <section className="border-y border-white/10 bg-[#111111] py-8 mt-12 mb-12 border-dashed">
+        <div className="max-w-5xl mx-auto flex flex-wrap justify-between items-center gap-8 px-6">
+          <div className="flex items-center gap-3">
+            <Activity className="w-5 h-5 text-[#a3a3a3]" />
+            <span className="text-sm font-medium text-[#d4d4d4]">Sub-10ms overhead</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="w-5 h-5 text-[#a3a3a3]" />
+            <span className="text-sm font-medium text-[#d4d4d4]">100% Data Privacy</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Box className="w-5 h-5 text-[#a3a3a3]" />
+            <span className="text-sm font-medium text-[#d4d4d4]">Self-hosted Open Source</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Compass className="w-5 h-5 text-[#a3a3a3]" />
+            <span className="text-sm font-medium text-[#d4d4d4]">Zero Vendor Lock-in</span>
+          </div>
+        </div>
+      </section>
+
+      {/* NEW: Supported Models Logo Cloud / Marquee */}
+      <section className="py-20 px-6 max-w-6xl mx-auto overflow-hidden">
+        <div className="text-center mb-10">
+          <p className="text-sm font-medium tracking-widest uppercase text-[#555555]">Intelligent payload translation between</p>
+        </div>
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale filter hover:grayscale-0 transition-all duration-700">
+          <div className="text-2xl font-bold tracking-tighter text-white">OpenAI</div>
+          <div className="text-2xl font-bold tracking-tighter text-white">Anthropic</div>
+          <div className="text-2xl font-bold tracking-tighter text-white">Google Gemini</div>
+          <div className="text-2xl font-bold tracking-tighter text-white border border-white/20 px-4 py-1 rounded-full text-sm">Mistral <span className="text-[#555]">soon</span></div>
+          <div className="text-2xl font-bold tracking-tighter text-white border border-white/20 px-4 py-1 rounded-full text-sm">Groq <span className="text-[#555]">soon</span></div>
+        </div>
+      </section>
+
+      {/* Advanced Bento Grid */}
+      <section className="py-24 px-6 max-w-6xl mx-auto border-t border-white/10">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-medium tracking-tighter text-white mb-4">Core Architecture</h2>
+          <p className="text-lg text-[#a3a3a3] max-w-2xl mx-auto">Built from the ground up for maximum speed and absolute reliability.</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[250px]">
+          {/* Caching - Wide */}
+          <div className="md:col-span-2 bg-[#111] border border-white/10 rounded-xl p-8 relative overflow-hidden group hover:bg-[#161616] transition-colors flex flex-col justify-end">
+            <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:text-white/10 transition-colors">
+              <Database className="w-32 h-32" strokeWidth={1} />
+            </div>
+            <div className="w-10 h-10 rounded border border-white/20 bg-black flex items-center justify-center text-white mb-auto mt-2 shadow-inner shadow-white/10">
+              <Database className="w-5 h-5" />
+            </div>
+            <h3 className="text-xl font-medium text-white mb-2 relative z-10">Edge Caching Layer</h3>
+            <p className="text-[#a3a3a3] text-sm leading-relaxed max-w-md relative z-10">Instant responses for exact-match payloads via native Redis integration. Stop paying upstream providers for repetitive queries.</p>
+          </div>
+
+          {/* Logging - Square */}
+          <div className="bg-[#111] border border-white/10 rounded-xl p-8 relative overflow-hidden group hover:bg-[#161616] transition-colors flex flex-col justify-end">
+            <div className="absolute -right-4 -bottom-4 text-white/5 group-hover:text-white/10 transition-colors">
+              <Activity className="w-40 h-40" strokeWidth={1} />
+            </div>
+            <div className="w-10 h-10 rounded border border-white/20 bg-black flex items-center justify-center text-white mb-auto mt-2 shadow-inner shadow-white/10">
+              <Activity className="w-5 h-5" />
+            </div>
+            <h3 className="text-xl font-medium text-white mb-2 relative z-10">Zero-Latency Logging</h3>
+            <p className="text-[#a3a3a3] text-sm leading-relaxed relative z-10">Non-blocking background queues securely log every request metric to Postgres.</p>
+          </div>
+
+          {/* Fallbacks - Wide */}
+          <div className="lg:col-span-3 bg-[#111] border border-white/10 rounded-xl p-8 relative overflow-hidden group hover:bg-[#161616] transition-colors flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8 gap-y-16">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent pointer-events-none" />
+            
+            <div className="max-w-lg z-10 order-2 sm:order-1">
+              <h3 className="text-2xl font-medium text-white mb-3">Automated Provider Fallbacks</h3>
+              <p className="text-[#a3a3a3] text-sm leading-relaxed">If OpenAI API limits out or throws a 500 error, the gateway invisibly reroutes the identical prompt payload to Google Gemini or Anthropic Claude within milliseconds. Absolute 100% uptime for production.</p>
+            </div>
+
+            <div className="w-12 h-12 rounded border border-white/20 bg-black flex items-center justify-center text-white shrink-0 order-1 sm:order-2 shadow-inner shadow-white/10 mb-auto sm:mb-0 sm:mt-auto">
+              <Split className="w-6 h-6" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Code Comparison */}
       <section className="py-24 px-6 max-w-6xl mx-auto border-t border-white/10">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-medium tracking-tighter text-white mb-4">Drop-in replacement.</h2>
-          <p className="text-lg text-[#a3a3a3] max-w-2xl mx-auto">Change a single line of code. We handle the rest.</p>
+          <p className="text-lg text-[#a3a3a3] max-w-2xl mx-auto">Change a single line of code. We handle the rest natively.</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 items-stretch pt-4">
@@ -126,77 +209,32 @@ const res = await openai.chat.completions.create({
         </div>
       </section>
 
-      {/* Trust & Performance Bar */}
-      <section className="border-y border-white/10 bg-[#111111] py-8 border-dashed">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-between items-center gap-8 px-6">
-          <div className="flex items-center gap-3">
-            <Activity className="w-5 h-5 text-[#a3a3a3]" />
-            <span className="text-sm font-medium text-[#d4d4d4]">Sub-10ms overhead</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-[#a3a3a3]" />
-            <span className="text-sm font-medium text-[#d4d4d4]">100% Data Privacy</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Box className="w-5 h-5 text-[#a3a3a3]" />
-            <span className="text-sm font-medium text-[#d4d4d4]">Self-hosted Open Source</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Compass className="w-5 h-5 text-[#a3a3a3]" />
-            <span className="text-sm font-medium text-[#d4d4d4]">Zero Vendor Lock-in</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Advanced Bento Grid */}
-      <section className="py-24 px-6 max-w-6xl mx-auto">
+      {/* Request Lifecycle */}
+      <section className="py-24 px-6 max-w-6xl mx-auto border-t border-white/10 z-10 relative">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-medium tracking-tighter text-white mb-4">Core Architecture</h2>
-          <p className="text-lg text-[#a3a3a3] max-w-2xl mx-auto">Built from the ground up for maximum speed and absolute reliability.</p>
+          <h2 className="text-3xl md:text-5xl font-medium tracking-tighter text-white mb-4">The Request Lifecycle</h2>
+          <p className="text-lg text-[#a3a3a3] max-w-2xl mx-auto">See exactly what happens in the milliseconds between your app and the provider.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[250px]">
-          {/* Caching - Wide */}
-          <div className="md:col-span-2 bg-[#111] border border-white/10 rounded-xl p-8 relative overflow-hidden group hover:bg-[#161616] transition-colors flex flex-col justify-end">
-            <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:text-white-10 transition-colors">
-              <Database className="w-32 h-32" strokeWidth={1} />
+        <div className="grid md:grid-cols-4 gap-6 relative md:pb-8">
+          <div className="hidden md:block absolute top-[32px] left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-white/0 via-white/20 to-white/0 pointer-events-none" />
+          
+          {[
+            { step: "01", title: "Intercept", desc: "Gateway receives the standard OpenAI-formatted payload from your application." },
+            { step: "02", title: "Hash & Cache", desc: "Calculates SHA-256 string. If found in Redis, it returns instantly (0 latency, $0 cost)." },
+            { step: "03", title: "Smart Route", desc: "If uncached, routes to OpenAI, Gemini, or Claude based on your fallback logic." },
+            { step: "04", title: "Log & Stream", desc: "Streams response back to client while asynchronously logging usage to Postgres." }
+          ].map((s, i) => (
+            <div key={i} className="relative z-10 flex flex-col items-center text-center p-8 bg-[#111111] border border-white/10 rounded-2xl shadow-xl hover:bg-[#161616] transition-colors group">
+              <div className="w-16 h-16 rounded-full bg-black border border-white/20 flex items-center justify-center text-white font-mono text-lg font-bold mb-6 shadow-inner shadow-white/5 group-hover:scale-110 transition-transform duration-500">
+                {s.step}
+              </div>
+              <h3 className="text-lg font-medium text-white mb-3">{s.title}</h3>
+              <p className="text-sm text-[#888888] leading-relaxed">{s.desc}</p>
             </div>
-            <div className="w-10 h-10 rounded border border-white/20 bg-black flex items-center justify-center text-white mb-auto mt-2 shadow-inner shadow-white/10">
-              <Database className="w-5 h-5" />
-            </div>
-            <h3 className="text-xl font-medium text-white mb-2 relative z-10">Edge Caching Layer</h3>
-            <p className="text-[#a3a3a3] text-sm leading-relaxed max-w-md relative z-10">Instant responses for exact-match payloads via native Redis integration. Stop paying OpenAI for repetitive queries.</p>
-          </div>
-
-          {/* Logging - Square */}
-          <div className="bg-[#111] border border-white/10 rounded-xl p-8 relative overflow-hidden group hover:bg-[#161616] transition-colors flex flex-col justify-end">
-            <div className="absolute -right-4 -bottom-4 text-white/5">
-              <Activity className="w-40 h-40" strokeWidth={1} />
-            </div>
-            <div className="w-10 h-10 rounded border border-white/20 bg-black flex items-center justify-center text-white mb-auto mt-2 shadow-inner shadow-white/10">
-              <Activity className="w-5 h-5" />
-            </div>
-            <h3 className="text-xl font-medium text-white mb-2 relative z-10">Zero-Latency Logging</h3>
-            <p className="text-[#a3a3a3] text-sm leading-relaxed relative z-10">Non-blocking background workers securely log every request metric.</p>
-          </div>
-
-          {/* Fallbacks - Wide */}
-          <div className="lg:col-span-3 bg-[#111] border border-white/10 rounded-xl p-8 relative overflow-hidden group hover:bg-[#161616] transition-colors flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8 gap-y-16">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent pointer-events-none" />
-            
-            <div className="max-w-lg z-10 order-2 sm:order-1">
-              <h3 className="text-2xl font-medium text-white mb-3">Automated Provider Fallbacks</h3>
-              <p className="text-[#a3a3a3] text-sm leading-relaxed">If OpenAI API limits out or throws a 500 error, the gateway invisibly reroutes the identical prompt payload to Google Gemini or Anthropic Claude within milliseconds. Absolute 100% uptime for production.</p>
-            </div>
-
-            <div className="w-12 h-12 rounded border border-white/20 bg-black flex items-center justify-center text-white shrink-0 order-1 sm:order-2 shadow-inner shadow-white/10 mb-auto sm:mb-0 sm:mt-auto">
-              <Split className="w-6 h-6" />
-            </div>
-          </div>
+          ))}
         </div>
       </section>
-
-
 
       {/* Features */}
       <section className="py-24 px-6 max-w-6xl mx-auto border-t border-white/10">
@@ -384,6 +422,31 @@ const res = await openai.chat.completions.create({
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="py-24 px-6 max-w-4xl mx-auto border-t border-white/10">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-medium tracking-tighter text-white mb-4">Frequently asked questions</h2>
+        </div>
+
+        <Accordion className="w-full">
+          {[
+            { q: "Do I need to change my existing prompts?", a: "No. AI Gateway is 100% compatible with the OpenAI API protocol. Your existing prompts, system messages, and functions work identically whether they ultimately route to OpenAI, Gemini, or Anthropic Claude.", value: "item-1" },
+            { q: "Is the proxy a single point of failure?", a: "AI Gateway is designed to be deployed to edge networks via Edge Runtime (like Vercel Edge or Cloudflare Workers) or horizontally scaled via Docker containers. The underlying proxy routing calculation logic is completely stateless.", value: "item-2" },
+            { q: "How secure are my API keys?", a: "Root provider keys (OpenAI, Anthropic) are heavily encrypted at rest in the database. Gateway keys generated for your client applications are hashed via SHA-256 and only shown exactly once during creation.", value: "item-3" },
+            { q: "Does response caching work with streaming?", a: "Yes. When a cached response is hit on a stream request, the gateway simulates an SSE format multiplex stream back to the client at high speed so your UI typing animations never prematurely break.", value: "item-4" }
+          ].map((faq) => (
+            <AccordionItem key={faq.value} value={faq.value} className="bg-[#111111] border-x border-t border-b border-white/10 rounded-2xl px-6 sm:px-8 mb-4 hover:bg-[#161616] transition-colors data-[open]:bg-[#161616] tracking-tight group/item">
+              <AccordionTrigger className="group flex flex-1 w-full items-center justify-between text-left text-base sm:text-lg font-medium text-white hover:no-underline py-6">
+                {faq.q}
+              </AccordionTrigger>
+              <AccordionContent className="text-[#a3a3a3] text-[14px] sm:text-[15px] leading-relaxed pb-6 text-left">
+                {faq.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </section>
+
       {/* Bottom CTA Block */}
       <section className="py-24 px-6 max-w-4xl mx-auto w-full">
         <div className="rounded-2xl border border-white/10 bg-[#111111] p-12 md:p-16 text-center shadow-2xl relative overflow-hidden">
@@ -399,7 +462,6 @@ const res = await openai.chat.completions.create({
           </Link>
         </div>
       </section>
-
     </>
   );
 }
