@@ -99,7 +99,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
         {/* Dynamic Prose Content */}
         <main className="flex-1 min-w-0 py-10 px-6 md:px-12 lg:px-16 overflow-x-hidden">
-          <div className="prose prose-invert prose-zinc max-w-3xl prose-pre:bg-[#111111] prose-pre:border prose-pre:border-white/10 prose-pre:text-[13px] prose-h2:scroll-mt-24 prose-h3:scroll-mt-24">
+          <div className="prose prose-invert prose-zinc max-w-3xl prose-pre:bg-[#111111] prose-pre:border prose-pre:border-white/10 prose-pre:text-[13px] prose-h2:scroll-mt-24 prose-h3:scroll-mt-24 prose-headings:tracking-tight prose-headings:font-medium prose-h1:tracking-tighter prose-h1:font-semibold prose-code:font-mono prose-code:text-[13px] prose-code:bg-white/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none prose-strong:text-white prose-p:text-[#888888] prose-li:text-[#888888]">
             {children}
           </div>
         </main>

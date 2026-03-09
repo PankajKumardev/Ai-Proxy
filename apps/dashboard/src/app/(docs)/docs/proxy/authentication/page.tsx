@@ -1,6 +1,7 @@
 import React from "react"
 import type { Metadata } from "next"
 import CodeBlock from "@/components/mdx/code-block"
+import { Key } from "lucide-react"
 
 export const metadata: Metadata = { title: "Authentication — AI Gateway Docs" }
 
@@ -31,9 +32,11 @@ export default function AuthPage() {
   }'`} 
       />
 
-      <div className="not-prose my-8 bg-black border border-white/10 rounded-xl p-6 relative overflow-hidden flex gap-4">
+      <div className="not-prose my-8 bg-[#111111] border border-white/10 rounded-xl p-6 relative overflow-hidden flex gap-4 shadow-xl">
         <div className="w-1.5 absolute left-0 top-0 bottom-0 bg-blue-500 rounded-l-xl"></div>
-        <div className="text-xl">🔑</div>
+        <div className="mt-1 flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10">
+          <Key className="w-4 h-4 text-white" />
+        </div>
         <div>
           <h4 className="font-semibold text-white mb-1">Key Segregation</h4>
           <p className="text-sm text-[#888888] leading-relaxed m-0">

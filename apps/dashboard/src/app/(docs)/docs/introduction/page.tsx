@@ -1,5 +1,6 @@
 import React from "react"
 import type { Metadata } from "next"
+import { Database, Route, BarChart3, Plug2, Zap } from "lucide-react"
 
 export const metadata: Metadata = { title: "Introduction — AI Gateway Docs" }
 
@@ -26,25 +27,50 @@ export default function IntroductionPage() {
 
       <h2>Features</h2>
       <ul className="list-none pl-0">
-        <li className="flex items-start gap-3 mb-2">
-          <span className="text-lg">🗄</span>
-          <div><strong className="text-foreground">Response Caching</strong> — SHA-256 exact match, configurable TTL per plan</div>
+        <li className="flex items-start gap-4 mb-3">
+          <div className="mt-1 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md bg-white/5 border border-white/10">
+            <Database className="w-4 h-4 text-white" />
+          </div>
+          <div className="leading-snug">
+            <strong className="text-white block mb-0.5">Response Caching</strong>
+            <span className="text-[#888888]">SHA-256 exact match, configurable TTL per plan</span>
+          </div>
         </li>
-        <li className="flex items-start gap-3 mb-2">
-          <span className="text-lg">🔀</span>
-          <div><strong className="text-foreground">Fallback Routing</strong> — Auto-retry across 3 providers with health tracking</div>
+        <li className="flex items-start gap-4 mb-3">
+          <div className="mt-1 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md bg-white/5 border border-white/10">
+            <Route className="w-4 h-4 text-white" />
+          </div>
+          <div className="leading-snug">
+            <strong className="text-white block mb-0.5">Fallback Routing</strong>
+            <span className="text-[#888888]">Auto-retry across 3 providers with health tracking</span>
+          </div>
         </li>
-        <li className="flex items-start gap-3 mb-2">
-          <span className="text-lg">📊</span>
-          <div><strong className="text-foreground">Usage Analytics</strong> — Tokens, cost, cache hit rate, per-request logging</div>
+        <li className="flex items-start gap-4 mb-3">
+          <div className="mt-1 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md bg-white/5 border border-white/10">
+            <BarChart3 className="w-4 h-4 text-white" />
+          </div>
+          <div className="leading-snug">
+            <strong className="text-white block mb-0.5">Usage Analytics</strong>
+            <span className="text-[#888888]">Tokens, cost, cache hit rate, per-request logging</span>
+          </div>
         </li>
-        <li className="flex items-start gap-3 mb-2">
-          <span className="text-lg">🔌</span>
-          <div><strong className="text-foreground">OpenAI Compatible</strong> — No SDK changes needed in your app</div>
+        <li className="flex items-start gap-4 mb-3">
+          <div className="mt-1 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md bg-white/5 border border-white/10">
+            <Plug2 className="w-4 h-4 text-white" />
+          </div>
+          <div className="leading-snug">
+            <strong className="text-white block mb-0.5">OpenAI Compatible</strong>
+            <span className="text-[#888888]">No SDK changes needed in your app</span>
+          </div>
         </li>
-        <li className="flex items-start gap-3 mb-2">
-          <span className="text-lg">⚡</span>
-          <div><strong className="text-foreground">Smart Routing</strong> — cheap / balanced / quality modes per request</div>
+        <li className="flex items-start gap-4 mb-3">
+          <div className="mt-1 flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-md bg-white/5 border border-white/10">
+            <Zap className="w-4 h-4 text-white" />
+          </div>
+          <div className="leading-snug">
+            <strong className="text-white block mb-0.5">Smart Routing</strong>
+            <span className="text-[#888888]">cheap / balanced / quality modes per request</span>
+          </div>
         </li>
       </ul>
 

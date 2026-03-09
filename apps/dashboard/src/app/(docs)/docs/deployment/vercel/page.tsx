@@ -1,5 +1,6 @@
 import React from "react"
 import type { Metadata } from "next"
+import { Triangle } from "lucide-react"
 
 export const metadata: Metadata = { title: "Vercel Deployment — AI Gateway Docs" }
 
@@ -22,9 +23,11 @@ export default function VercelDeploymentPage() {
         <strong>Note:</strong> Hono API proxy routes utilizing Edge configurations also deploy synchronously to Vercel's global edge network without configuration overhead natively.
       </p>
 
-      <div className="not-prose my-8 bg-black border border-white/10 rounded-xl p-6 relative overflow-hidden flex gap-4">
+      <div className="not-prose my-8 bg-[#111111] border border-white/10 rounded-xl p-6 relative overflow-hidden flex gap-4 shadow-xl">
         <div className="w-1.5 absolute left-0 top-0 bottom-0 bg-white rounded-l-xl"></div>
-        <div className="text-xl">▲</div>
+        <div className="mt-1 flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10">
+          <Triangle className="w-3.5 h-3.5 text-white fill-white" />
+        </div>
         <div>
           <h4 className="font-semibold text-white mb-1">Monorepo Root Setup</h4>
           <p className="text-sm text-[#888888] leading-relaxed m-0">

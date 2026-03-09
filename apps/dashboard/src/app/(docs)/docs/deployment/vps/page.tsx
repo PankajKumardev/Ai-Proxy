@@ -1,6 +1,7 @@
 import React from "react"
 import type { Metadata } from "next"
 import CodeBlock from "@/components/mdx/code-block"
+import { Globe } from "lucide-react"
 
 export const metadata: Metadata = { title: "VPS Deployment — AI Gateway Docs" }
 
@@ -32,9 +33,11 @@ npm install -g pm2
 pm2 start npm --name "ai-gateway" -- start`} 
       />
 
-      <div className="not-prose my-8 bg-black border border-white/10 rounded-xl p-6 relative overflow-hidden flex gap-4">
+      <div className="not-prose my-8 bg-[#111111] border border-white/10 rounded-xl p-6 relative overflow-hidden flex gap-4 shadow-lg">
         <div className="w-1.5 absolute left-0 top-0 bottom-0 bg-purple-500 rounded-l-xl"></div>
-        <div className="text-xl">🌐</div>
+        <div className="mt-1 flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-purple-500/10 border border-purple-500/20">
+          <Globe className="w-4 h-4 text-purple-400" />
+        </div>
         <div>
           <h4 className="font-semibold text-white mb-1">Nginx Reverse Proxy</h4>
           <p className="text-sm text-[#888888] leading-relaxed m-0">
