@@ -1,7 +1,7 @@
 // apps/dashboard/src/app/(marketing)/page.tsx
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowRight, Database, Server, Split, Code, Activity, ShieldCheck, Star, Box, Compass, CloudLightning, RefreshCw, Layers } from "lucide-react";
+import { ArrowRight, Database, Server, Split, Code, Activity, ShieldCheck, Star, Box, Compass, CloudLightning, RefreshCw, Layers, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -205,23 +205,84 @@ const res = await openai.chat.completions.create({
           <p className="text-lg text-[#a3a3a3] max-w-2xl mx-auto">Enterprise-grade capabilities out of the box.</p>
         </div>
         
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            { icon: Database, title: "Response Caching", desc: "SHA-256 exact match caching with per-plan TTL. Cache hits return instantly and cost $0.00." },
-            { icon: Split, title: "Fallback Routing", desc: "Auto-retry across 3 providers with health tracking. If OpenAI is down, Gemini picks up instantly." },
-            { icon: Activity, title: "Usage Analytics", desc: "Real-time token counts, cost breakdown, cache hit rate, and per-model statistics." },
-            { icon: Code, title: "OpenAI Compatible", desc: "Drop-in replacement. Change baseURL, keep your existing SDK, models, and prompts." },
-            { icon: Server, title: "Smart Routing", desc: "Choose cheap, balanced, or quality routing per request. Different strategy for each use case." },
-            { icon: ShieldCheck, title: "Secure by Default", desc: "API keys stored as SHA-256 hashes. Rate limiting, CORS, body size limits — all built in." },
-          ].map((f) => (
-            <div key={f.title} className="bg-[#111111] border border-white/10 rounded-xl p-6 hover:bg-[#161616] transition-colors group">
-              <div className="w-10 h-10 rounded border border-white/20 bg-black flex items-center justify-center text-white mb-4 shadow-inner shadow-white/5">
-                <f.icon className="w-5 h-5 text-white" />
-              </div>
-              <h3 className="text-base font-medium text-white mb-2">{f.title}</h3>
-              <p className="text-[#a3a3a3] text-sm leading-relaxed">{f.desc}</p>
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-6 auto-rows-[minmax(260px,auto)]">
+          {/* Caching - Wide col-span-2 */}
+          <div className="lg:col-span-2 bg-[#111111] border border-white/10 rounded-2xl p-8 hover:bg-[#161616] transition-colors relative overflow-hidden flex flex-col justify-end group">
+            <div className="absolute top-0 right-0 p-8 text-white/[0.02] group-hover:text-white/[0.04] transition-colors pointer-events-none">
+              <Database className="w-48 h-48 -mr-16 -mt-16" strokeWidth={1} />
             </div>
-          ))}
+            <div className="w-12 h-12 rounded-lg border border-white/20 bg-black flex items-center justify-center text-white mb-auto shadow-inner shadow-white/5 relative z-10">
+              <Database className="w-6 h-6 text-white" />
+            </div>
+            <div className="relative z-10 mt-8">
+              <h3 className="text-xl font-medium text-white mb-2">Response Caching</h3>
+              <p className="text-[#a3a3a3] text-[15px] leading-relaxed max-w-sm">SHA-256 exact match caching with per-plan TTL. Cache hits return instantly and cost $0.00.</p>
+            </div>
+          </div>
+
+          {/* Fallback - Tall row-span-2 col-span-1 */}
+          <div className="lg:col-span-1 lg:row-span-2 bg-[#111111] border border-white/10 rounded-2xl p-8 hover:bg-[#161616] transition-colors relative overflow-hidden flex flex-col justify-start group">
+             <div className="absolute bottom-0 right-0 p-8 text-white/[0.02] group-hover:text-white/[0.04] transition-colors pointer-events-none">
+                <Split className="w-48 h-48 -mr-12 -mb-12" strokeWidth={1} />
+             </div>
+             <div className="w-12 h-12 rounded-lg border border-white/20 bg-black flex items-center justify-center text-white mb-8 shadow-inner shadow-white/5 relative z-10">
+              <Split className="w-6 h-6 text-white" />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-xl font-medium text-white mb-2">Fallback Routing</h3>
+              <p className="text-[#a3a3a3] text-[15px] leading-relaxed">Auto-retry across 3 providers with health tracking. If OpenAI is down, Gemini picks up instantly.</p>
+            </div>
+          </div>
+
+          {/* Security - Tall row-span-2 col-span-1 */}
+          <div className="lg:col-span-1 lg:row-span-2 bg-[#111111] border border-white/10 rounded-2xl p-8 hover:bg-[#161616] transition-colors relative overflow-hidden flex flex-col justify-start group">
+            <div className="absolute bottom-0 left-0 p-8 text-white/[0.02] group-hover:text-white/[0.04] transition-colors pointer-events-none">
+              <ShieldCheck className="w-48 h-48 -ml-12 -mb-12" strokeWidth={1} />
+            </div>
+            <div className="w-12 h-12 rounded-lg border border-white/20 bg-black flex items-center justify-center text-white mb-8 shadow-inner shadow-white/5 relative z-10">
+              <ShieldCheck className="w-6 h-6 text-white" />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-xl font-medium text-white mb-2">Secure by Default</h3>
+              <p className="text-[#a3a3a3] text-[15px] leading-relaxed">API keys stored as SHA-256 hashes. Built-in rate limiting.</p>
+            </div>
+          </div>
+
+          {/* Analytics - Standard col-span-1 */}
+          <div className="lg:col-span-1 bg-[#111111] border border-white/10 rounded-2xl p-8 hover:bg-[#161616] transition-colors relative overflow-hidden flex flex-col justify-between group">
+            <div className="w-12 h-12 rounded-lg border border-white/20 bg-black flex items-center justify-center text-white mb-8 shadow-inner shadow-white/5 relative z-10">
+              <Activity className="w-6 h-6 text-white" />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-xl font-medium text-white mb-2">Usage Analytics</h3>
+              <p className="text-[#a3a3a3] text-[15px] leading-relaxed">Real-time token counts, cost breakdowns.</p>
+            </div>
+          </div>
+
+          {/* OpenAI - Standard col-span-1 */}
+          <div className="lg:col-span-1 bg-[#111111] border border-white/10 rounded-2xl p-8 hover:bg-[#161616] transition-colors relative overflow-hidden flex flex-col justify-between group">
+            <div className="w-12 h-12 rounded-lg border border-white/20 bg-black flex items-center justify-center text-white mb-8 shadow-inner shadow-white/5 relative z-10">
+              <Code className="w-6 h-6 text-white" />
+            </div>
+            <div className="relative z-10">
+              <h3 className="text-xl font-medium text-white mb-2">OpenAI Compatible</h3>
+              <p className="text-[#a3a3a3] text-[15px] leading-relaxed">Drop-in replacement. Same SDKs and prompts.</p>
+            </div>
+          </div>
+
+          {/* Smart Routing - Wide col-span-4 */}
+          <div className="lg:col-span-4 bg-[#111111] border border-white/10 rounded-2xl p-8 hover:bg-[#161616] transition-colors relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between group">
+             <div className="absolute top-0 right-0 p-8 text-white/[0.02] group-hover:text-white/[0.04] transition-colors pointer-events-none">
+              <Server className="w-64 h-64 -mr-16 -mt-16" strokeWidth={1} />
+            </div>
+            <div className="max-w-xl relative z-10 order-2 md:order-1 mt-8 md:mt-0">
+              <h3 className="text-2xl font-medium text-white mb-3">Smart Routing Control</h3>
+              <p className="text-[#a3a3a3] text-[15px] leading-relaxed">Choose cheap, balanced, or quality routing per request. Set entirely different fallback strategies for discrete LLM use cases dynamically.</p>
+            </div>
+            <div className="w-16 h-16 rounded-xl border border-white/20 bg-black flex items-center justify-center text-white shadow-inner shadow-white/5 relative z-10 order-1 md:order-2 shrink-0">
+              <Server className="w-8 h-8 text-white" />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -230,39 +291,94 @@ const res = await openai.chat.completions.create({
         <h2 className="text-3xl md:text-5xl font-medium tracking-tighter text-white mb-4">Simple pricing</h2>
         <p className="text-lg text-[#a3a3a3] mb-16">Start free. Scale when you're ready.</p>
         
-        <div className="grid md:grid-cols-3 gap-6 items-stretch max-w-5xl mx-auto text-left">
+        <div className="grid md:grid-cols-3 gap-8 items-stretch max-w-5xl mx-auto text-left">
           {[
-            { name: "Free", price: "$0", desc: "10K requests/mo", cta: "Start for Free", featured: false },
-            { name: "Pro", price: "$29", desc: "500K requests/mo", cta: "Start Trial", featured: true },
-            { name: "Enterprise", price: "Custom", desc: "Unlimited volume", cta: "Contact Sales", featured: false },
+            {
+              name: "Free",
+              price: "$0",
+              desc: "Perfect for solo developers evaluating the gateway.",
+              cta: "Start for Free",
+              featured: false,
+              features: [
+                { label: "10,000 requests / month", included: true },
+                { label: "OpenAI only", included: true },
+                { label: "24-hour cache TTL", included: true },
+                { label: "Dashboard access", included: true },
+                { label: "Fallback routing", included: false },
+                { label: "Smart routing modes", included: false },
+              ],
+            },
+            {
+              name: "Pro",
+              price: "$29",
+              desc: "For production apps that need reliability.",
+              cta: "Start Pro Trial",
+              featured: true,
+              features: [
+                { label: "500,000 requests / month", included: true },
+                { label: "All 3 providers", included: true },
+                { label: "7-day cache TTL", included: true },
+                { label: "Dashboard access", included: true },
+                { label: "Fallback routing", included: true },
+                { label: "cheap / balanced routing", included: true },
+              ],
+            },
+            {
+              name: "Enterprise",
+              price: "Custom",
+              desc: "Unlimited scale and custom integrations.",
+              cta: "Contact Sales",
+              featured: false,
+              features: [
+                { label: "Unlimited requests", included: true },
+                { label: "All providers + custom", included: true },
+                { label: "Custom cache TTL", included: true },
+                { label: "Dashboard access", included: true },
+                { label: "Fallback routing", included: true },
+                { label: "Custom routing strategies", included: true },
+              ],
+            },
           ].map((plan) => (
             <div
               key={plan.name}
               className={cn(
-                "relative flex flex-col p-8 rounded-xl transition-all", 
+                "relative flex flex-col p-10 rounded-2xl transition-all", 
                 plan.featured 
-                  ? "bg-[#111111] border border-white/20 shadow-2xl z-10 md:scale-105" 
+                  ? "bg-[#111111] border border-white/20 shadow-2xl z-10 md:scale-105 ring-1 ring-white/10" 
                   : "bg-black border border-white/10 opacity-80 hover:opacity-100"
               )}
             >
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xl font-medium text-white">{plan.name}</span>
+              <div className="flex items-center justify-between mb-6">
+                <span className="text-2xl font-medium text-white">{plan.name}</span>
                 {plan.featured && (
-                  <span className="text-[10px] uppercase font-bold tracking-widest bg-white text-black px-2 py-0.5 rounded-sm">Popular</span>
+                  <span className="text-xs uppercase font-bold tracking-widest bg-white text-black px-3 py-1 rounded">Popular</span>
                 )}
               </div>
-              <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-4xl font-medium tracking-tighter text-white">{plan.price}</span>
-                {plan.price !== "Custom" && <span className="text-[#a3a3a3] font-medium text-sm">/mo</span>}
+              <div className="flex items-baseline gap-1 mb-3">
+                <span className="text-5xl font-medium tracking-tighter text-white">{plan.price}</span>
+                {plan.price !== "Custom" && <span className="text-[#a3a3a3] font-medium text-base">/mo</span>}
               </div>
-              <p className="text-sm text-[#888888] mb-8 flex-1">{plan.desc}</p>
+              <p className="text-base text-[#888888] mb-10">{plan.desc}</p>
               
               <Link
                 href={plan.name === "Enterprise" ? "mailto:hello@ai-gateway.dev" : "/signup"}
-                className={cn("inline-flex items-center justify-center shrink-0 transition-transform hover:scale-[0.98] w-full rounded-md h-10 px-4 text-sm font-semibold", plan.featured ? "bg-white text-black" : "border border-white/20 bg-transparent text-white hover:bg-white/10")}
+                className={cn("inline-flex items-center justify-center shrink-0 transition-transform hover:scale-[0.98] w-full rounded-lg h-12 px-6 text-base font-semibold mb-8", plan.featured ? "bg-white text-black shadow-lg shadow-white/5" : "border border-white/20 bg-transparent text-white hover:bg-white/10")}
               >
                 {plan.cta}
               </Link>
+
+              <div className="border-t border-white/10 pt-8 space-y-4 flex-1">
+                {plan.features.map((f, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <div className={`flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full ${f.included ? "bg-white/10 text-white" : "bg-transparent text-[#333333]"}`}>
+                      {f.included ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                    </div>
+                    <span className={`text-[15px] leading-tight ${f.included ? "text-[#d4d4d4]" : "text-[#555555] line-through decoration-[#333]"}`}>
+                      {f.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>

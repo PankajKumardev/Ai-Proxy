@@ -116,44 +116,44 @@ export default function PricingPage() {
       </div>
 
       {/* Plan cards */}
-      <div className="grid md:grid-cols-3 gap-6 items-stretch max-w-5xl mx-auto text-left mb-24">
+      <div className="grid md:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto text-left mb-24">
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`relative flex flex-col p-8 rounded-xl transition-all ${
+            className={`relative flex flex-col p-10 rounded-2xl transition-all ${
               plan.featured 
-                ? "bg-[#111111] border border-white/20 shadow-2xl z-10 md:scale-105" 
+                ? "bg-[#111111] border border-white/20 shadow-2xl z-10 md:scale-105 ring-1 ring-white/10" 
                 : "bg-black border border-white/10 opacity-80 hover:opacity-100"
             }`}
           >
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xl font-medium text-white">{plan.name}</span>
+            <div className="flex items-center justify-between mb-6">
+              <span className="text-2xl font-medium text-white">{plan.name}</span>
               {plan.featured && (
-                <span className="text-[10px] uppercase font-bold tracking-widest bg-white text-black px-2 py-0.5 rounded-sm">Popular</span>
+                <span className="text-xs uppercase font-bold tracking-widest bg-white text-black px-3 py-1 rounded">Popular</span>
               )}
             </div>
-            <div className="flex items-baseline gap-1 mb-2">
-              <span className="text-4xl font-medium tracking-tighter text-white">{plan.price}</span>
-              {plan.price !== "Custom" && <span className="text-[#a3a3a3] font-medium text-sm">{plan.period}</span>}
+            <div className="flex items-baseline gap-1 mb-4">
+              <span className="text-5xl font-medium tracking-tighter text-white">{plan.price}</span>
+              {plan.price !== "Custom" && <span className="text-[#a3a3a3] font-medium text-base">{plan.period}</span>}
             </div>
-            <p className="text-sm text-[#888888] mb-8 flex-1">{plan.desc}</p>
+            <p className="text-base text-[#888888] mb-10 flex-1">{plan.desc}</p>
             
             <Link
               href={plan.href}
-              className={`inline-flex items-center justify-center shrink-0 transition-transform hover:scale-[0.98] w-full rounded-md h-10 px-4 text-sm font-semibold mb-8 ${
-                plan.featured ? "bg-white text-black" : "border border-white/20 bg-transparent text-white hover:bg-white/10"
+              className={`inline-flex items-center justify-center shrink-0 transition-transform hover:scale-[0.98] w-full rounded-lg h-14 px-6 text-base font-semibold mb-10 ${
+                plan.featured ? "bg-white text-black shadow-lg shadow-white/5" : "border border-white/20 bg-transparent text-white hover:bg-white/10"
               }`}
             >
               {plan.cta}
             </Link>
 
-            <div className="border-t border-white/10 pt-6 space-y-3">
+            <div className="border-t border-white/10 pt-8 space-y-4">
               {plan.features.map((f, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className={`mt-0.5 flex-shrink-0 ${f.included ? "text-white" : "text-[#333333]"}`}>
-                    {f.included ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                <div key={i} className="flex items-center gap-4">
+                  <div className={`flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full ${f.included ? "bg-white/10 text-white" : "bg-transparent text-[#333333]"}`}>
+                    {f.included ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
                   </div>
-                  <span className={`text-sm leading-tight ${f.included ? "text-[#d4d4d4]" : "text-[#555555]"}`}>
+                  <span className={`text-[15px] leading-tight ${f.included ? "text-[#d4d4d4]" : "text-[#555555] line-through decoration-[#333]"}`}>
                     {f.label}
                   </span>
                 </div>
