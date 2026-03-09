@@ -56,16 +56,16 @@
 }
 
 :root {
-  /* Enforced Linear/Vercel styling: Deep Black #09090b background, Slate Gray #27272a borders */
-  --background: #09090b;
+  /* Enforced Linear/Supabase/Resend styling: Deep Black #09090b background, Slate Gray #27272a or thin white borders */
+  --background: #0A0A0A;
   --foreground: #fafafa;
-  --card: #09090b;
+  --card: #18181B; /* Elevated Surface */
   --card-foreground: #fafafa;
-  --popover: #09090b;
+  --popover: #18181B;
   --popover-foreground: #fafafa;
   
-  --primary: #fafafa;
-  --primary-foreground: #09090b;
+  --primary: #6366F1; /* Electric Indigo */
+  --primary-foreground: #ffffff;
   
   --secondary: #27272a;
   --secondary-foreground: #f4f4f5;
@@ -73,15 +73,15 @@
   --muted: #27272a;
   --muted-foreground: #a1a1aa;
   
-  --accent: #27272a;
+  --accent: #27272A;
   --accent-foreground: #fafafa;
   
   --destructive: #7f1d1d;
   --destructive-foreground: #fca5a5;
   
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #d4d4d8;
+  --border: rgba(255, 255, 255, 0.08); /* Ultra-subtle borders */
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #6366F1; /* sharp indigo focus ring */
   
   --radius: 0.5rem;
 }
@@ -91,10 +91,11 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased selection:bg-white/20 selection:text-white;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-white;
   }
   
-  code, pre, .font-mono {
+  /* Strictly enforce coding font globally for specific tags */
+  code, pre, .font-mono, td:nth-child(2), td.font-mono {
     font-family: var(--font-mono), monospace !important;
   }
 }
@@ -108,11 +109,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Linear-style Glow Utilities */
@@ -125,7 +126,7 @@
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+  background: linear-gradient(to bottom right, #6366F1, #14F195);
   mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -134,12 +135,12 @@
 
 .hero-glow {
   position: absolute;
-  top: -150px;
+  top: -100px;
   left: 50%;
   transform: translateX(-50%);
-  width: 800px;
+  width: 700px;
   height: 400px;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.25) 0%, rgba(20, 241, 149, 0.1) 40%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }

@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const outfit = Outfit({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
-  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -36,7 +35,7 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans text-foreground antialiased",
-          outfit.variable,
+          inter.variable,
           jetbrainsMono.variable
         )}
       >

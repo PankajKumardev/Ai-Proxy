@@ -1,13 +1,16 @@
 import { auth } from "@/auth"
 import { PrismaClient } from "@prisma/client"
 import type { Metadata } from "next"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Activity, Database, DollarSign, Target } from "lucide-react"
 
 export const metadata: Metadata = { title: "Overview — AI Gateway Dashboard" }
 
 const prisma = new PrismaClient()
 
 function formatCost(cost: number) {
-  return `$${cost.toFixed(2)}`
+  return `$${cost.toFixed(4)}`
 }
 function formatNumber(n: number) {
   return n.toLocaleString()
@@ -51,84 +54,98 @@ export default async function DashboardOverviewPage() {
     },
   })
 
-  const statCards = [
-    { label: "Total Requests", value: formatNumber(totalRequests), icon: "◉", color: "#a855f7" },
-    { label: "Total Tokens", value: totalTokens > 1_000_000 ? `${(totalTokens / 1_000_000).toFixed(1)}M` : formatNumber(totalTokens), icon: "⚡", color: "#3b82f6" },
-    { label: "Estimated Cost", value: formatCost(totalCost), icon: "$", color: "#10b981" },
-    { label: "Cache Hit Rate", value: `${cacheHitRate}%`, icon: "🎯", color: "#f59e0b" },
-  ]
-
   return (
-    <div>
-      <div style={{ marginBottom: "32px" }}>
-        <h1 style={{ fontSize: "28px", fontWeight: 800, color: "white", marginBottom: "4px" }}>Overview</h1>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "15px" }}>Your gateway usage at a glance</p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Overview</h1>
+        <p className="text-sm text-muted-foreground mt-1">Monitor your gateway usage, performance, and costs.</p>
       </div>
 
-      {/* Stat cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: "16px", marginBottom: "40px" }}>
-        {statCards.map((card) => (
-          <div
-            key={card.label}
-            className="stat-card"
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "14px",
-              padding: "24px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-              <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>{card.label}</span>
-              <span style={{ fontSize: "18px" }}>{card.icon}</span>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="shadow-none rounded-xl border-border bg-card">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Total Requests</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold tracking-tight text-foreground">{formatNumber(totalRequests)}</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="shadow-none rounded-xl border-border bg-card">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Total Tokens</CardTitle>
+            <Database className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold tracking-tight text-primary">
+              {totalTokens > 1_000_000 ? `${(totalTokens / 1_000_000).toFixed(1)}M` : formatNumber(totalTokens)}
             </div>
-            <div style={{ fontSize: "32px", fontWeight: 800, color: card.color }}>{card.value}</div>
-          </div>
-        ))}
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-none rounded-xl border-border bg-card">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Est. Cost</CardTitle>
+            <DollarSign className="h-4 w-4 text-emerald-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold tracking-tight text-emerald-500">{formatCost(totalCost)}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-none rounded-xl border-border bg-card">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Cache Hits</CardTitle>
+            <Target className="h-4 w-4 text-amber-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold tracking-tight text-amber-500">{cacheHitRate}%</div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Recent requests table */}
-      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", overflow: "hidden" }}>
-        <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-          <h2 style={{ fontSize: "16px", fontWeight: 700, color: "white" }}>Recent Requests</h2>
-        </div>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
-            <thead>
-              <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                {["Provider", "Model", "Tokens", "Cost", "Cache", "Latency", "Time"].map((h) => (
-                  <th key={h} style={{ padding: "12px 16px", textAlign: "left", color: "rgba(255,255,255,0.4)", fontWeight: 600, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {recent.map((r) => (
-                <tr key={r.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                  <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.85)", fontWeight: 600, textTransform: "capitalize" }}>{r.provider}</td>
-                  <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.6)" }}>{r.model}</td>
-                  <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.7)" }}>{r.tokens.toLocaleString()}</td>
-                  <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.7)" }}>{`$${r.cost.toFixed(4)}`}</td>
-                  <td style={{ padding: "12px 16px" }}>
-                    <span style={{ background: r.cacheHit ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.12)", color: r.cacheHit ? "#10b981" : "#ef4444", padding: "2px 8px", borderRadius: "100px", fontSize: "11px", fontWeight: 700 }}>
-                      {r.cacheHit ? "HIT" : "MISS"}
-                    </span>
-                  </td>
-                  <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.5)" }}>{r.latencyMs}ms</td>
-                  <td style={{ padding: "12px 16px", color: "rgba(255,255,255,0.4)", whiteSpace: "nowrap", fontSize: "12px" }}>
-                    {new Date(r.timestamp).toLocaleTimeString()}
-                  </td>
-                </tr>
-              ))}
-              {recent.length === 0 && (
-                <tr>
-                  <td colSpan={7} style={{ padding: "48px", textAlign: "center", color: "rgba(255,255,255,0.3)" }}>
-                    No requests yet. Make your first API call to see data here.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div className="rounded-xl border border-border bg-card shadow-none overflow-hidden text-sm">
+        <div className="p-5 border-b border-border font-semibold text-foreground">Recent Activity</div>
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent border-border/50">
+              <TableHead className="font-semibold text-xs tracking-wider uppercase text-muted-foreground">ID</TableHead>
+              <TableHead className="font-semibold text-xs tracking-wider uppercase text-muted-foreground">Provider</TableHead>
+              <TableHead className="font-semibold text-xs tracking-wider uppercase text-muted-foreground">Model</TableHead>
+              <TableHead className="font-semibold text-xs tracking-wider uppercase text-muted-foreground text-right">Tokens</TableHead>
+              <TableHead className="font-semibold text-xs tracking-wider uppercase text-muted-foreground text-right">Cost</TableHead>
+              <TableHead className="font-semibold text-xs tracking-wider uppercase text-muted-foreground text-center">Cache</TableHead>
+              <TableHead className="font-semibold text-xs tracking-wider uppercase text-muted-foreground text-right">Latency</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {recent.map((r) => (
+              <TableRow key={r.id} className="border-border/50 hover:bg-white/5 transition-colors">
+                <TableCell className="font-mono text-xs text-muted-foreground max-w-[100px] truncate" title={r.requestId}>
+                  {r.requestId.split('-')[0]}
+                </TableCell>
+                <TableCell className="capitalize text-foreground">{r.provider}</TableCell>
+                <TableCell className="font-mono text-muted-foreground text-xs">{r.model}</TableCell>
+                <TableCell className="text-right font-mono text-foreground">{r.tokens.toLocaleString()}</TableCell>
+                <TableCell className="text-right font-mono text-foreground">${r.cost.toFixed(4)}</TableCell>
+                <TableCell className="text-center">
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${r.cacheHit ? "bg-emerald-500/15 text-emerald-400" : "bg-muted text-muted-foreground"}`}>
+                    {r.cacheHit ? "Hit" : "Miss"}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right font-mono text-muted-foreground">{r.latencyMs}ms</TableCell>
+              </TableRow>
+            ))}
+            {recent.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                  No requests yet. Make your first API call.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
   )

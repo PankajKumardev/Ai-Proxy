@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Copy, Plus, Trash2, Key } from "lucide-react"
+import { CreateKeyDialog } from "@/components/create-key-dialog"
 
 export const metadata: Metadata = { title: "API Keys — AI Gateway Dashboard" }
 const prisma = new PrismaClient()
@@ -65,16 +66,7 @@ export default async function KeysPage({
           <p className="text-sm text-muted-foreground mt-1">Manage your gateway access keys for authenticating API requests.</p>
         </div>
         
-        <form action={createKey} className="flex flex-col sm:flex-row gap-3">
-          <Input 
-            name="name" 
-            placeholder="Key name (e.g., Production)" 
-            className="w-full sm:w-[250px] bg-background"
-          />
-          <Button type="submit" className="gap-2 shrink-0">
-            <Plus className="w-4 h-4" /> Create new key
-          </Button>
-        </form>
+        <CreateKeyDialog action={createKey} />
       </div>
 
       {newKey && (

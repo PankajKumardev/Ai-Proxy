@@ -55,67 +55,12 @@ export default async function RequestsPage({
         <p className="text-sm text-muted-foreground mt-1">Inspect and replay individual requests across your providers.</p>
       </div>
 
-      {detail && (
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
-          <div className="p-6">
-            <div className="flex flex-col md:flex-row justify-between items-start gap-6 border-b border-border pb-6 mb-6">
-              <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Request ID</p>
-                <div className="flex items-center gap-2">
-                  <code className="bg-muted px-2 py-1 rounded text-sm font-mono text-foreground border border-border/50">
-                    {detail.requestId}
-                  </code>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-8 md:gap-12">
-                {[
-                  { label: "Provider", value: detail.provider },
-                  { label: "Model", value: detail.model },
-                  { label: "Latency", value: `${detail.latencyMs}ms` },
-                  { label: "Cost", value: `$${detail.cost.toFixed(4)}` },
-                ].map((m) => (
-                  <div key={m.label}>
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{m.label}</p>
-                    <p className="text-base font-semibold text-foreground capitalize">{m.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
 
-            {detail.promptJson ? (
-              <div className="grid lg:grid-cols-2 gap-6">
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Code2 className="w-4 h-4 text-muted-foreground" />
-                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Prompt Payload</h3>
-                  </div>
-                  <pre className="mt-2 w-full rounded-md bg-black border border-border/50 p-4 text-sm font-mono text-muted-foreground overflow-auto max-h-[300px] shadow-inner">
-                    {JSON.stringify(JSON.parse(detail.promptJson), null, 2)}
-                  </pre>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Activity className="w-4 h-4 text-muted-foreground" />
-                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Response JSON</h3>
-                  </div>
-                  <pre className="mt-2 w-full rounded-md bg-black border border-border/50 p-4 text-sm font-mono text-muted-foreground overflow-auto max-h-[300px] shadow-inner">
-                    {detail.responseJson ? JSON.stringify(JSON.parse(detail.responseJson), null, 2) : "// Content not stored for this request"}
-                  </pre>
-                </div>
-              </div>
-            ) : (
-              <div className="py-8 text-center bg-muted/20 border border-border border-dashed rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  Prompt content not stored. Enable "Store request content" in Settings to log payloads.
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
-      {/* Requests Table */}
-      <div className="rounded-md border bg-card text-card-foreground shadow-sm">
+      <div className={detail ? "grid grid-cols-1 xl:grid-cols-[1fr_600px] gap-6 items-start" : "block"}>
+        
+        {/* Requests Table (Left Pane mostly) */}
+        <div className="rounded-md border bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col xl:sticky xl:top-20">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -196,6 +141,73 @@ export default async function RequestsPage({
             </div>
           </div>
         )}
+      </div>
+
+      {detail && (
+        <div className="rounded-lg border bg-card text-card-foreground shadow-sm overflow-hidden">
+          <div className="p-6">
+            <div className="flex flex-col gap-6 border-b border-border pb-6 mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Request ID</p>
+                  <code className="bg-muted px-2 py-1 rounded text-sm font-mono text-foreground border border-border/50">
+                    {detail.requestId}
+                  </code>
+                </div>
+                <Link href="/dashboard/requests" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                  ✕ Close
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                {[
+                  { label: "Provider", value: detail.provider },
+                  { label: "Model", value: detail.model },
+                  { label: "Latency", value: `${detail.latencyMs}ms` },
+                  { label: "Cost", value: `$${detail.cost.toFixed(4)}` },
+                ].map((m) => (
+                  <div key={m.label}>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">{m.label}</p>
+                    <p className="text-sm font-semibold text-foreground capitalize font-mono">{m.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {detail.promptJson ? (
+              <div className="flex flex-col gap-6">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Code2 className="w-4 h-4 text-muted-foreground" />
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Prompt Payload</h3>
+                    </div>
+                  </div>
+                  <pre className="mt-2 w-full rounded-md bg-black border border-border/50 p-4 text-sm font-mono text-muted-foreground overflow-auto max-h-[400px] shadow-inner">
+                    {JSON.stringify(JSON.parse(detail.promptJson), null, 2)}
+                  </pre>
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-muted-foreground" />
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Response JSON</h3>
+                    </div>
+                  </div>
+                  <pre className="mt-2 w-full rounded-md bg-black border border-border/50 p-4 text-sm font-mono text-muted-foreground overflow-auto max-h-[400px] shadow-inner">
+                    {detail.responseJson ? JSON.stringify(JSON.parse(detail.responseJson), null, 2) : "// Content not stored for this request"}
+                  </pre>
+                </div>
+              </div>
+            ) : (
+              <div className="py-8 text-center bg-muted/20 border border-border border-dashed rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  Prompt content not stored. Enable "Store request content" in Settings to log payloads.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       </div>
     </div>
   )
