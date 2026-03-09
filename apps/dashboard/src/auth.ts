@@ -3,15 +3,15 @@ import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { PrismaClient } from "@prisma/client"
 import bcrypt from "bcryptjs"
+import { authConfig } from "./auth.config"
 
 const prisma = new PrismaClient()
 
+// Full auth config — extends authConfig with Prisma adapter + real credential validation
+// Used ONLY in Server Components and API routes (not in proxy.ts / Edge)
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
-  pages: {
-    signIn: "/login",
-  },
   providers: [
     Credentials({
       name: "credentials",
@@ -41,20 +41,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-        token.plan = (user as any).plan
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        (session.user as any).id = token.id as string
-          ; (session.user as Record<string, unknown>).plan = token.plan
-      }
-      return session
-    },
-  },
 })

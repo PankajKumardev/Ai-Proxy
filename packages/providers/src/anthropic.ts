@@ -112,3 +112,72 @@ export async function callAnthropic(
     clearTimeout(timer)
   }
 }
+
+export async function callAnthropicStream(
+  body: ChatRequest,
+  anthropicModel: string,
+  options: ProviderCallOptions = {}
+): Promise<Response> {
+  const apiKey = await getProviderKey("anthropic")
+  const timeout = options.timeout ?? 30000
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeout)
+  if (options.signal) {
+    options.signal.addEventListener("abort", () => controller.abort())
+  }
+
+  try {
+    const systemMessages = body.messages.filter((m: Message) => m.role === "system")
+    const systemText = systemMessages
+      .map((m: Message) =>
+        typeof m.content === "string" ? m.content : JSON.stringify(m.content)
+      )
+      .join("\n")
+
+    const nonSystemMessages = body.messages
+      .filter((m: Message) => m.role !== "system")
+      .map((m: Message) => ({
+        role: (m.role === "assistant" ? "assistant" : "user") as "user" | "assistant",
+        content:
+          typeof m.content === "string" ? m.content : JSON.stringify(m.content),
+      }))
+
+    const anthropicBody: Record<string, unknown> = {
+      model: anthropicModel,
+      messages: nonSystemMessages,
+      max_tokens: body.max_tokens ?? 4096,
+      stream: true,
+      ...(systemText && { system: systemText }),
+      ...(body.temperature !== undefined && { temperature: body.temperature }),
+    }
+
+    const response = await fetch(`${BASE_URL}/v1/messages`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2024-06-20",
+      },
+      body: JSON.stringify(anthropicBody),
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      clearTimeout(timer)
+      const errBody = await response.json().catch(() => ({}))
+      const err = new Error(`Anthropic stream error: ${response.status}`) as Error & {
+        status: number
+        body: unknown
+      }
+      err.status = response.status
+      err.body = errBody
+      throw err
+    }
+
+    return response
+  } catch (e) {
+    clearTimeout(timer)
+    throw e
+  }
+}

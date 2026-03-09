@@ -113,3 +113,54 @@ export async function callGemini(
     clearTimeout(timer)
   }
 }
+
+export async function callGeminiStream(
+  body: ChatRequest,
+  geminiModel: string,
+  options: ProviderCallOptions = {}
+): Promise<Response> {
+  const apiKey = await getProviderKey("gemini")
+  const timeout = options.timeout ?? 30000
+
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeout)
+  if (options.signal) {
+    options.signal.addEventListener("abort", () => controller.abort())
+  }
+
+  try {
+    // Gemini streaming endpoint: streamGenerateContent with alt=sse
+    const url = `${BASE_URL}/v1/models/${geminiModel}:streamGenerateContent?key=${apiKey}&alt=sse`
+    const geminiBody = {
+      contents: convertMessagesToGemini(body.messages),
+      generationConfig: {
+        ...(body.temperature !== undefined && { temperature: body.temperature }),
+        ...(body.max_tokens !== undefined && { maxOutputTokens: body.max_tokens }),
+      },
+    }
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(geminiBody),
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      clearTimeout(timer)
+      const errBody = await response.json().catch(() => ({}))
+      const err = new Error(`Gemini stream error: ${response.status}`) as Error & {
+        status: number
+        body: unknown
+      }
+      err.status = response.status
+      err.body = errBody
+      throw err
+    }
+
+    return response
+  } catch (e) {
+    clearTimeout(timer)
+    throw e
+  }
+}

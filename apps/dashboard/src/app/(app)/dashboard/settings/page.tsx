@@ -3,6 +3,9 @@ import { PrismaClient } from "@prisma/client"
 import { redirect } from "next/navigation"
 import bcrypt from "bcryptjs"
 import type { Metadata } from "next"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { CheckCircle2, XCircle, ShieldAlert, Lock, Mail, ScanEye, Trash2 } from "lucide-react"
 
 export const metadata: Metadata = { title: "Settings — AI Gateway Dashboard" }
 const prisma = new PrismaClient()
@@ -22,19 +25,28 @@ async function updatePassword(formData: FormData) {
   if (!session) redirect("/login")
   const currentPassword = formData.get("currentPassword") as string
   const newPassword = formData.get("newPassword") as string
-
   const user = await prisma.user.findUnique({ where: { id: session.user?.id as string } })
   if (!user) redirect("/login")
-
   const valid = await bcrypt.compare(currentPassword, user.passwordHash)
   if (!valid) redirect("/dashboard/settings?error=password")
-
   const passwordHash = await bcrypt.hash(newPassword, 12)
   await prisma.user.update({ where: { id: user.id }, data: { passwordHash } })
   redirect("/dashboard/settings?success=password")
 }
 
-async function deleteAccount(formData: FormData) {
+async function updateLogging(formData: FormData) {
+  "use server"
+  const session = await auth()
+  if (!session) redirect("/login")
+  const storeRequestLogs = formData.get("storeRequestLogs") === "on"
+  await prisma.user.update({
+    where: { id: session.user?.id as string },
+    data: { storeRequestLogs },
+  })
+  redirect("/dashboard/settings?success=logging")
+}
+
+async function deleteAccount() {
   "use server"
   const session = await auth()
   if (!session) redirect("/login")
@@ -48,89 +60,147 @@ export default async function SettingsPage({
   searchParams: Promise<{ success?: string; error?: string }>
 }) {
   const session = await auth()
+  if (!session) redirect("/login")
   const resolvedParams = await searchParams
 
-  const inputStyle = {
-    width: "100%",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: "8px",
-    padding: "11px 14px",
-    color: "white",
-    fontSize: "14px",
-    outline: "none",
-    boxSizing: "border-box" as const,
-  }
-  const labelStyle = {
-    display: "block",
-    fontSize: "13px",
-    fontWeight: 600 as const,
-    color: "rgba(255,255,255,0.6)" as const,
-    marginBottom: "8px",
-  }
-  const cardStyle = {
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: "14px",
-    padding: "28px",
-    marginBottom: "20px",
-  }
+  const userRecord = await prisma.user.findUnique({
+    where: { id: session.user?.id as string },
+    select: { storeRequestLogs: true },
+  })
+  const storeRequestLogs = userRecord?.storeRequestLogs ?? false
 
   return (
-    <div style={{ maxWidth: "560px" }}>
-      <div style={{ marginBottom: "32px" }}>
-        <h1 style={{ fontSize: "28px", fontWeight: 800, color: "white", marginBottom: "4px" }}>Settings</h1>
-        <p style={{ color: "rgba(255,255,255,0.5)" }}>Manage your account</p>
+    <div className="max-w-xl space-y-6">
+      {/* Page header */}
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+        <p className="text-sm text-muted-foreground mt-1">Manage your account preferences and security.</p>
       </div>
 
-      {resolvedParams.success === "email" && <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: "8px", padding: "12px 16px", color: "#10b981", fontSize: "14px", marginBottom: "20px" }}>✓ Email updated successfully</div>}
-      {resolvedParams.success === "password" && <div style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: "8px", padding: "12px 16px", color: "#10b981", fontSize: "14px", marginBottom: "20px" }}>✓ Password updated successfully</div>}
-      {resolvedParams.error === "password" && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "8px", padding: "12px 16px", color: "#ef4444", fontSize: "14px", marginBottom: "20px" }}>✗ Current password is incorrect</div>}
+      {/* Toast banners */}
+      {resolvedParams.success === "email" && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-500">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          Email updated successfully.
+        </div>
+      )}
+      {resolvedParams.success === "password" && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-500">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          Password updated successfully.
+        </div>
+      )}
+      {resolvedParams.success === "logging" && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-500">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          Privacy settings saved.
+        </div>
+      )}
+      {resolvedParams.error === "password" && (
+        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <XCircle className="h-4 w-4 shrink-0" />
+          Current password is incorrect.
+        </div>
+      )}
 
-      {/* Update email */}
-      <div style={cardStyle}>
-        <h2 style={{ fontSize: "16px", fontWeight: 700, color: "white", marginBottom: "20px" }}>Update Email</h2>
-        <form action={updateEmail} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <div>
-            <label style={labelStyle}>Current email</label>
-            <div style={{ ...inputStyle, color: "rgba(255,255,255,0.4)", cursor: "not-allowed" }}>{session?.user?.email}</div>
+      {/* Update Email */}
+      <div className="rounded-lg border bg-card p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4 text-muted-foreground" />
+          <h2 className="font-semibold">Update Email</h2>
+        </div>
+        <form action={updateEmail} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Current email</label>
+            <div className="flex h-10 w-full rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-muted-foreground cursor-not-allowed">
+              {session?.user?.email}
+            </div>
           </div>
-          <div>
-            <label style={labelStyle}>New email</label>
-            <input type="email" name="email" required placeholder="new@example.com" style={inputStyle} />
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">New email</label>
+            <Input id="email" type="email" name="email" required placeholder="new@example.com" />
           </div>
-          <button type="submit" style={{ background: "rgba(168,85,247,0.15)", color: "#a855f7", border: "1px solid rgba(168,85,247,0.3)", borderRadius: "8px", padding: "10px 20px", fontWeight: 700, fontSize: "14px", cursor: "pointer", alignSelf: "flex-start" }}>
-            Save Email
-          </button>
+          <Button type="submit" variant="outline" size="sm">Save Email</Button>
         </form>
       </div>
 
-      {/* Update password */}
-      <div style={cardStyle}>
-        <h2 style={{ fontSize: "16px", fontWeight: 700, color: "white", marginBottom: "20px" }}>Update Password</h2>
-        <form action={updatePassword} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <div>
-            <label style={labelStyle}>Current password</label>
-            <input type="password" name="currentPassword" required placeholder="••••••••" style={inputStyle} />
+      {/* Update Password */}
+      <div className="rounded-lg border bg-card p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Lock className="h-4 w-4 text-muted-foreground" />
+          <h2 className="font-semibold">Update Password</h2>
+        </div>
+        <form action={updatePassword} className="space-y-4">
+          <div className="space-y-1.5">
+            <label htmlFor="currentPassword" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Current password</label>
+            <Input id="currentPassword" type="password" name="currentPassword" required placeholder="••••••••" />
           </div>
-          <div>
-            <label style={labelStyle}>New password</label>
-            <input type="password" name="newPassword" required minLength={8} placeholder="••••••••" style={inputStyle} />
+          <div className="space-y-1.5">
+            <label htmlFor="newPassword" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">New password</label>
+            <Input id="newPassword" type="password" name="newPassword" required minLength={8} placeholder="••••••••" />
           </div>
-          <button type="submit" style={{ background: "rgba(168,85,247,0.15)", color: "#a855f7", border: "1px solid rgba(168,85,247,0.3)", borderRadius: "8px", padding: "10px 20px", fontWeight: 700, fontSize: "14px", cursor: "pointer", alignSelf: "flex-start" }}>
-            Update Password
-          </button>
+          <Button type="submit" variant="outline" size="sm">Update Password</Button>
         </form>
       </div>
 
-      {/* Danger zone */}
-      <div style={{ ...cardStyle, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.03)" }}>
-        <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#ef4444", marginBottom: "8px" }}>Danger Zone</h2>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "14px", marginBottom: "20px" }}>Deleting your account is permanent. All API keys and usage logs will be removed immediately.</p>
-        <form action={deleteAccount} onSubmit={(e) => { if (!confirm("Are you sure? This will permanently delete your account and all data.")) e.preventDefault() }}>
-          <button type="submit" style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "8px", padding: "10px 20px", fontWeight: 700, fontSize: "14px", cursor: "pointer" }}>
+      {/* Privacy: Request Logging Toggle */}
+      <div className="rounded-lg border bg-card p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <ScanEye className="h-4 w-4 text-muted-foreground" />
+          <h2 className="font-semibold">Privacy &amp; Request Logging</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          When enabled, the gateway stores the full prompt and response payload for each request. Required for the{" "}
+          <span className="font-medium text-foreground">Request Replay</span> feature.{" "}
+          <span className="font-medium text-foreground">Off by default</span> — recommended for sensitive workloads (healthcare, legal, finance).
+        </p>
+        <form action={updateLogging} className="flex items-center gap-4">
+          {/* Native toggle built with Tailwind */}
+          <label htmlFor="storeRequestLogs" className="flex items-center gap-3 cursor-pointer select-none">
+            <div className="relative">
+              <input
+                type="checkbox"
+                id="storeRequestLogs"
+                name="storeRequestLogs"
+                defaultChecked={storeRequestLogs}
+                className="peer sr-only"
+              />
+              {/* Track */}
+              <div className={`w-11 h-6 rounded-full border transition-colors ${
+                storeRequestLogs
+                  ? "bg-primary/20 border-primary/50"
+                  : "bg-muted border-border"
+              } peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2`} />
+              {/* Thumb */}
+              <div className={`absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-all ${
+                storeRequestLogs ? "left-[22px]" : "left-[3px]"
+              }`} />
+            </div>
+            <span className="text-sm font-medium">Store request &amp; response content</span>
+          </label>
+          <Button type="submit" variant="outline" size="sm">Save</Button>
+        </form>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <ShieldAlert className="h-4 w-4 text-destructive" />
+          <h2 className="font-semibold text-destructive">Danger Zone</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Deleting your account is permanent. All API keys and usage logs will be removed immediately and cannot be recovered.
+        </p>
+        <form action={deleteAccount}>
+          <Button
+            type="submit"
+            variant="destructive"
+            size="sm"
+            className="gap-2"
+          >
+            <Trash2 className="h-4 w-4" />
             Delete Account
-          </button>
+          </Button>
         </form>
       </div>
     </div>

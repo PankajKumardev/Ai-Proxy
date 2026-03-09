@@ -13,7 +13,7 @@ import { authMiddleware } from "./middleware/auth"
 import { quotaMiddleware } from "./middleware/quota"
 import { rateLimitMiddleware } from "./middleware/rate-limit"
 import { cacheMiddleware } from "./middleware/cache"
-import { router } from "./router"
+import { router, routerStream } from "./router"
 
 // Type the context variables so c.set/c.get are not 'never'
 type AppVariables = {
@@ -28,10 +28,45 @@ const redis = Redis.fromEnv()
 async function logUsage(data: Record<string, unknown>) {
   const { PrismaClient } = await import("@prisma/client")
   const prisma = new PrismaClient()
-  setImmediate(() => {
-    prisma.usageLog.create({ data: data as Parameters<typeof prisma.usageLog.create>[0]["data"] })
-      .catch((err: Error) => console.error("[logger] DB write failed:", err.message))
-      .finally(() => prisma.$disconnect())
+  setImmediate(async () => {
+    try {
+      // Check if user has opted into request/response logging
+      let logData = { ...data }
+      if (data.userId && (data.promptJson || data.responseJson)) {
+        const user = await prisma.user.findUnique({
+          where: { id: data.userId as string },
+          select: { storeRequestLogs: true },
+        })
+        if (!user?.storeRequestLogs) {
+          // User hasn't opted in — strip prompt/response content
+          delete logData.promptJson
+          delete logData.responseJson
+        }
+      }
+
+      await prisma.usageLog.create({
+        data: logData as Parameters<typeof prisma.usageLog.create>[0]["data"],
+      })
+
+      // Log retention: cap at 1,000 logs per user (fire-and-forget trim)
+      if (data.userId) {
+        const oldLogs = await prisma.usageLog.findMany({
+          where: { userId: data.userId as string },
+          orderBy: { timestamp: "desc" },
+          skip: 1000,
+          select: { id: true },
+        })
+        if (oldLogs.length > 0) {
+          await prisma.usageLog.deleteMany({
+            where: { id: { in: oldLogs.map((l) => l.id) } },
+          })
+        }
+      }
+    } catch (err: unknown) {
+      console.error("[logger] DB write failed:", (err as Error).message)
+    } finally {
+      await prisma.$disconnect()
+    }
   })
 }
 
@@ -70,8 +105,9 @@ app.use("/v1/*", async (c, next) => {
     // If not JSON, use default 1MB limit
   }
   const maxSize = hasImages ? 10 * 1024 * 1024 : 1 * 1024 * 1024
-  return bodyLimit({ maxSize, onError: (c) =>
-    c.json({ error: { type: "payload_error", message: "Request body exceeds allowed size" } }, 413)
+  return bodyLimit({
+    maxSize, onError: (c) =>
+      c.json({ error: { type: "payload_error", message: "Request body exceeds allowed size" } }, 413)
   })(c, next)
 })
 
@@ -119,66 +155,43 @@ app.post(
     // Track total requests
     setImmediate(() => redis.incr("metrics:total_requests"))
 
-    // --- Streaming path ---
+    // --- Streaming path (user opted in via stream: true) ---
     if (body.stream) {
-      c.header("Content-Type", "text/event-stream")
-      c.header("Cache-Control", "no-cache")
-      c.header("Connection", "keep-alive")
-
       const abortController = new AbortController()
       c.req.raw.signal?.addEventListener("abort", () => abortController.abort())
 
       try {
-        const result = await router(body, { user, mode, signal: abortController.signal })
-        const { data: response, provider, model } = result
-
-        const tokens = response.usage?.total_tokens ?? countTokens(model, body.messages)
-        const cost = calculateCost(
-          model,
-          response.usage?.prompt_tokens ?? Math.floor(tokens * 0.7),
-          response.usage?.completion_tokens ?? Math.floor(tokens * 0.3)
+        const { response: providerResponse, provider, model } = await routerStream(
+          body,
+          { user, mode, signal: abortController.signal }
         )
 
-        // Log after stream (fire-and-forget)
         const latencyMs = Date.now() - startTime
+
+        // Fire-and-forget log (tokens unknown at stream-start — logged as 0)
         setImmediate(() => logUsage({
           requestId,
           userId: user.userId,
           provider,
           model,
-          tokens,
-          cost,
+          tokens: 0,         // unknown at stream-start; logged as 0
+          cost: 0,
           cacheHit: false,
           latencyMs,
         }))
 
-        // Return SSE stream
-        const streamBody = new ReadableStream({
-          start(controller) {
-            const content = response.choices?.[0]?.message?.content ?? ""
-            const words = content.split(" ")
+        // Pipe the raw provider SSE body directly to the client — real chunk passthrough
+        const providerBody = providerResponse.body
+        if (!providerBody) {
+          return c.json({ error: { type: "provider_error", message: "Empty stream from provider" } }, 502)
+        }
 
-            // Simulate SSE chunks
-            const sendChunk = async () => {
-              for (const word of words) {
-                const chunk = JSON.stringify({
-                  id: response.id,
-                  choices: [{ delta: { content: word + " " } }],
-                })
-                controller.enqueue(new TextEncoder().encode(`data: ${chunk}\n\n`))
-                await new Promise((r) => setTimeout(r, 20))
-              }
-              controller.enqueue(new TextEncoder().encode("data: [DONE]\n\n"))
-              controller.close()
-            }
-
-            sendChunk().catch(() => controller.close())
-          },
-        })
-
-        return new Response(streamBody, {
+        return new Response(providerBody, {
+          status: 200,
           headers: {
             "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
             "X-Request-ID": requestId,
           },
         })
@@ -264,7 +277,7 @@ app.notFound((c) =>
 
 // --- Start server ---
 const port = parseInt(process.env.PORT ?? "3000")
-console.log(`🚀 AI Gateway proxy running on http://localhost:${port}`)
+console.log(`AI Gateway proxy running on http://localhost:${port}`)
 
 serve({ fetch: app.fetch, port })
 

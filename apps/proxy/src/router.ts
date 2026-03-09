@@ -1,8 +1,7 @@
-// apps/proxy/src/router.ts
 // Fallback router with provider health tracking, smart routing modes, and exponential backoff
 
 import { Redis } from "@upstash/redis"
-import { modelMap, callOpenAI, callGemini, callAnthropic, isRetryable } from "@ai-gateway/providers"
+import { modelMap, callOpenAI, callOpenAIStream, callGemini, callGeminiStream, callAnthropic, callAnthropicStream, isRetryable } from "@ai-gateway/providers"
 import type { ChatRequest, ChatResponse, UserContext } from "@ai-gateway/providers"
 
 const redis = Redis.fromEnv()
@@ -15,9 +14,9 @@ const backoffMs = [0, 200, 500]
 
 // Routing modes — provider order by strategy (March 2026)
 const routingModes: Record<string, string[]> = {
-  cheap:    ["gemini", "anthropic", "openai"],   // Gemini 2.5 Flash-Lite cheapest ($0.10/1M)
+  cheap: ["gemini", "anthropic", "openai"],   // Gemini 2.5 Flash-Lite cheapest ($0.10/1M)
   balanced: ["openai", "gemini", "anthropic"],    // GPT-5.2 / 2.5 Flash — fast + good
-  quality:  ["openai", "anthropic", "gemini"],    // GPT-5.4 → Claude Opus 4.6 → Gemini 3.1 Pro
+  quality: ["openai", "anthropic", "gemini"],    // GPT-5.4 → Claude Opus 4.6 → Gemini 3.1 Pro
 }
 
 // --- Provider health tracking ---
@@ -130,5 +129,74 @@ export async function router(
   }
   err.status = 502
   err.providers_tried = providersTried
+  throw err
+}
+
+// --- Streaming router: returns raw SSE Response for passthrough ---
+
+export interface RouterStreamResult {
+  response: Response
+  provider: string
+  model: string
+}
+
+export async function routerStream(
+  body: ChatRequest,
+  context: { user: UserContext; mode?: string; signal?: AbortSignal }
+): Promise<RouterStreamResult> {
+  const { user, signal } = context
+  const mode = context.mode ?? "balanced"
+
+  const providers =
+    user.plan === "free"
+      ? ["openai"]
+      : (routingModes[mode] ?? routingModes.balanced)
+
+  const errors: Error[] = []
+
+  for (let i = 0; i < providers.length; i++) {
+    const provider = providers[i]
+
+    const healthy = await isProviderHealthy(provider)
+    if (!healthy) {
+      errors.push(new Error(`Provider ${provider} is temporarily unavailable`))
+      continue
+    }
+
+    if (i > 0 && backoffMs[i]) {
+      await new Promise((res) => setTimeout(res, backoffMs[i]))
+    }
+
+    try {
+      let streamResponse: Response
+
+      if (provider === "openai") {
+        streamResponse = await callOpenAIStream({ ...body, stream: true }, { timeout: STREAM_TIMEOUT_MS, signal })
+      } else if (provider === "gemini") {
+        const geminiModel = modelMap[body.model]?.gemini ?? body.model
+        streamResponse = await callGeminiStream({ ...body }, geminiModel, { timeout: STREAM_TIMEOUT_MS, signal })
+      } else if (provider === "anthropic") {
+        const anthropicModel = modelMap[body.model]?.anthropic ?? body.model
+        streamResponse = await callAnthropicStream({ ...body }, anthropicModel, { timeout: STREAM_TIMEOUT_MS, signal })
+      } else {
+        throw new Error(`Unknown provider: ${provider}`)
+      }
+
+      await markProviderHealthy(provider)
+      return { response: streamResponse, provider, model: body.model }
+    } catch (e) {
+      const err = e as Error
+      errors.push(err)
+      if (!isRetryable(e)) throw e
+      await markProviderUnhealthy(provider)
+    }
+  }
+
+  const err = new Error("All providers failed") as Error & {
+    status: number
+    providers_tried: string[]
+  }
+  err.status = 502
+  err.providers_tried = providers
   throw err
 }

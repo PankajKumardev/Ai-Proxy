@@ -11,15 +11,16 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(cuid())
-  email        String     @unique
-  passwordHash String
-  plan         String     @default("free") // "free" | "pro" | "enterprise"
-  quotaUsed    Int        @default(0) // requests used this month
-  quotaResetAt DateTime   @default(now()) // resets 1st of each month UTC
-  createdAt    DateTime   @default(now())
-  apiKeys      ApiKey[]
-  usageLogs    UsageLog[]
+  id                String     @id @default(cuid())
+  email             String     @unique
+  passwordHash      String
+  plan              String     @default("free") // "free" | "pro" | "enterprise"
+  quotaUsed         Int        @default(0) // requests used this month
+  quotaResetAt      DateTime   @default(now()) // resets 1st of each month UTC
+  storeRequestLogs  Boolean    @default(false)  // opt-in: store promptJson/responseJson
+  createdAt         DateTime   @default(now())
+  apiKeys           ApiKey[]
+  usageLogs         UsageLog[]
 }
 
 model ApiKey {
