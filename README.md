@@ -49,9 +49,9 @@ const openai = new OpenAI({
   apiKey: "sk-gw-xxxx",   // your gateway key, not your OpenAI key
 })
 
-// Everything else stays exactly the same ↓
+// Any supported model — OpenAI, Gemini, Anthropic ↓
 const response = await openai.chat.completions.create({
-  model: "gpt-4o",
+  model: "gpt-5.2",         // or: gemini-2.5-flash, claude-sonnet-4-6, gpt-5-nano...
   messages: [{ role: "user", content: "Hello!" }],
 })
 ```
@@ -69,11 +69,11 @@ const response = await openai.chat.completions.create({
 
 | Layer | Tech |
 |---|---|
-| Proxy | Hono + Node.js |
-| Database | Neon (Postgres) + Prisma |
+| Proxy | Hono 4.12 + Node.js |
+| Database | Neon (Postgres) + Prisma 7 |
 | Cache | Upstash Redis |
-| Dashboard | Next.js 15 App Router |
-| Auth | NextAuth v5 + bcrypt |
+| Dashboard | Next.js 16 App Router |
+| Auth | NextAuth v4 + bcrypt |
 
 ## 🔧 Configuration
 
@@ -136,6 +136,25 @@ ai-gateway/
 | Dashboard | Vercel (connect GitHub) |
 | Database | Neon (free tier) |
 | Cache | Upstash (free tier) |
+
+## 🤖 Supported Models (March 2026)
+
+| Model | Provider | Input $/1M | Output $/1M |
+|---|---|---|---|
+| `gpt-5.4` | OpenAI | $2.50 | $15.00 |
+| `gpt-5.2` | OpenAI | $1.75 | $14.00 |
+| `gpt-5-mini` | OpenAI | $0.25 | $2.00 |
+| `gpt-5-nano` | OpenAI | $0.05 | $0.40 |
+| `gpt-4o` | OpenAI | $2.50 | $10.00 |
+| `gpt-4o-mini` | OpenAI | $0.15 | $0.60 |
+| `o3-mini` | OpenAI | $1.10 | $4.40 |
+| `gemini-3.1-pro` | Gemini | $2.00 | $12.00 |
+| `gemini-2.5-pro` | Gemini | $1.25 | $10.00 |
+| `gemini-2.5-flash` | Gemini | $0.30 | $2.50 |
+| `gemini-2.5-flash-lite` | Gemini | $0.10 | $0.40 |
+| `claude-opus-4-6` | Anthropic | $5.00 | $25.00 |
+| `claude-sonnet-4-6` | Anthropic | $3.00 | $15.00 |
+| `claude-haiku-4-5` | Anthropic | $1.00 | $5.00 |
 
 ## 📄 License
 

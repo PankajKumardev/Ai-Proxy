@@ -1,4 +1,3 @@
-// apps/dashboard/src/app/(docs)/docs/introduction/page.tsx
 import type { Metadata } from "next"
 
 export const metadata: Metadata = { title: "Introduction — AI Gateway Docs" }
@@ -21,7 +20,7 @@ export default function IntroductionPage() {
 
       <h2 style={{ fontSize: "24px", fontWeight: 700, color: "white", marginTop: "40px", marginBottom: "16px" }}>Architecture</h2>
       <pre style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "24px", color: "rgba(255,255,255,0.8)", fontFamily: "monospace", overflow: "auto", fontSize: "13px", lineHeight: 1.8 }}>
-{`Your App → AI Gateway → OpenAI / Gemini / Anthropic`}
+        {`Your App → AI Gateway → OpenAI / Gemini / Anthropic`}
       </pre>
 
       <h2 style={{ fontSize: "24px", fontWeight: 700, color: "white", marginTop: "40px", marginBottom: "16px" }}>Features</h2>
@@ -33,14 +32,42 @@ export default function IntroductionPage() {
         <li style={{ marginBottom: "8px" }}>⚡ <strong style={{ color: "white" }}>Smart Routing</strong> — cheap / balanced / quality modes per request</li>
       </ul>
 
+      <h2 style={{ fontSize: "24px", fontWeight: 700, color: "white", marginTop: "40px", marginBottom: "16px" }}>Supported Models (March 2026)</h2>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "2px", background: "rgba(255,255,255,0.05)", borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", fontSize: "13px" }}>
+        {[
+          ["Model ID", "Provider", "In $/1M", "Out $/1M"],
+          ["gpt-5.4",            "OpenAI",    "$2.50",  "$15.00"],
+          ["gpt-5.2",            "OpenAI",    "$1.75",  "$14.00"],
+          ["gpt-5-mini",         "OpenAI",    "$0.25",  "$2.00"],
+          ["gpt-5-nano",         "OpenAI",    "$0.05",  "$0.40"],
+          ["gpt-4o",             "OpenAI",    "$2.50",  "$10.00"],
+          ["gpt-4o-mini",        "OpenAI",    "$0.15",  "$0.60"],
+          ["o3-mini",            "OpenAI",    "$1.10",  "$4.40"],
+          ["gemini-3.1-pro",     "Gemini",    "$2.00",  "$12.00"],
+          ["gemini-2.5-pro",     "Gemini",    "$1.25",  "$10.00"],
+          ["gemini-2.5-flash",   "Gemini",    "$0.30",  "$2.50"],
+          ["gemini-2.5-flash-lite","Gemini",  "$0.10",  "$0.40"],
+          ["claude-opus-4-6",    "Anthropic", "$5.00",  "$25.00"],
+          ["claude-sonnet-4-6",  "Anthropic", "$3.00",  "$15.00"],
+          ["claude-haiku-4-5",   "Anthropic", "$1.00",  "$5.00"],
+        ].map(([model, provider, inp, out], i) => (
+          <>
+            <div key={`m${i}`} style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "rgba(255,255,255,0.85)", fontWeight: i === 0 ? 700 : 500, borderBottom: "1px solid rgba(255,255,255,0.05)", fontFamily: "monospace" }}>{model}</div>
+            <div key={`p${i}`} style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "rgba(255,255,255,0.55)", fontWeight: i === 0 ? 700 : 400, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{provider}</div>
+            <div key={`i${i}`} style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "#10b981", fontWeight: i === 0 ? 700 : 500, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{inp}</div>
+            <div key={`o${i}`} style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "#f59e0b", fontWeight: i === 0 ? 700 : 500, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{out}</div>
+          </>
+        ))}
+      </div>
+
       <h2 style={{ fontSize: "24px", fontWeight: 700, color: "white", marginTop: "40px", marginBottom: "16px" }}>Tech Stack</h2>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "2px", background: "rgba(255,255,255,0.05)", borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", fontSize: "14px" }}>
         {[
-          ["Hono + Node.js", "Edge-ready proxy, 3.5× faster than Express"],
+          ["Hono 4.12 + Node.js", "Edge-ready proxy, 3.5× faster than Express"],
           ["Neon DB (Postgres)", "Serverless Postgres — always use pooled connection"],
           ["Upstash Redis", "HTTP-based Redis for caching + rate limiting"],
-          ["Next.js 15 App Router", "Landing page, docs, and dashboard in one app"],
-          ["NextAuth v5", "JWT sessions, Prisma adapter, email/password auth"],
+          ["Next.js 16 App Router", "Landing page, docs, and dashboard in one app"],
+          ["NextAuth v4", "JWT sessions, Prisma adapter, email/password auth"],
         ].map(([tool, why]) => (
           <>
             <div key={`t-${tool}`} style={{ padding: "12px 16px", background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.9)", fontWeight: 600, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{tool}</div>

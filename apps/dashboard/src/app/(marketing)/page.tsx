@@ -15,9 +15,9 @@ const openai = new OpenAI({
   apiKey: "sk-gw-xxxx",  // your gateway key
 })
 
-// Everything else stays identical ↓
+// Any supported model — OpenAI, Gemini, or Anthropic ↓
 const res = await openai.chat.completions.create({
-  model: "gpt-4o",
+  model: "gpt-5.2",       // or: gemini-2.5-flash, claude-sonnet-4-6
   messages: [{ role: "user", content: "Hello!" }],
 })`
 
@@ -423,7 +423,7 @@ OpenAI      Gemini    Anthropic`}</pre>
             <a href="https://github.com" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none" }}>GitHub</a>
             <Link href="/pricing" style={{ color: "rgba(255,255,255,0.4)", textDecoration: "none" }}>Pricing</Link>
           </div>
-          <div>© 2025 AI Gateway — Open Source (MIT)</div>
+          <div>© 2026 AI Gateway — Open Source (MIT)</div>
         </div>
       </footer>
     </>
