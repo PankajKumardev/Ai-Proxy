@@ -214,9 +214,9 @@ const res = await openai.chat.completions.create({
             { icon: Server, title: "Smart Routing", desc: "Choose cheap, balanced, or quality routing per request. Different strategy for each use case." },
             { icon: ShieldCheck, title: "Secure by Default", desc: "API keys stored as SHA-256 hashes. Rate limiting, CORS, body size limits — all built in." },
           ].map((f) => (
-            <div key={f.title} className="bg-[#0A0A0A] border border-white/10 rounded-xl p-6 hover:bg-[#111111] transition-colors group">
-              <div className="w-8 h-8 flex items-center mb-4 text-[#d4d4d4]">
-                <f.icon className="w-5 h-5" />
+            <div key={f.title} className="bg-[#111111] border border-white/10 rounded-xl p-6 hover:bg-[#161616] transition-colors group">
+              <div className="w-10 h-10 rounded border border-white/20 bg-black flex items-center justify-center text-white mb-4 shadow-inner shadow-white/5">
+                <f.icon className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-base font-medium text-white mb-2">{f.title}</h3>
               <p className="text-[#a3a3a3] text-sm leading-relaxed">{f.desc}</p>
@@ -241,7 +241,7 @@ const res = await openai.chat.completions.create({
               className={cn(
                 "relative flex flex-col p-8 rounded-xl transition-all", 
                 plan.featured 
-                  ? "bg-[#111] border border-white/20 glow-accent shadow-2xl z-10 md:scale-105" 
+                  ? "bg-[#111111] border border-white/20 shadow-2xl z-10 md:scale-105" 
                   : "bg-black border border-white/10 opacity-80 hover:opacity-100"
               )}
             >

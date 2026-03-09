@@ -29,19 +29,49 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-10 px-6 mt-auto bg-[#0A0A0A]">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2 font-bold text-white tracking-widest uppercase text-sm">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-[#a3a3a3]"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> 
-            AI Gateway
+      <footer className="border-t border-white/10 bg-[#000000] pt-16 pb-12 px-6 mt-auto">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
+          <div className="col-span-2 lg:col-span-2">
+            <Link href="/" className="flex items-center gap-2 font-bold tracking-widest uppercase text-white mb-4 text-sm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> 
+              AI Gateway
+            </Link>
+            <p className="text-sm text-[#888888] leading-relaxed max-w-xs">
+              Enterprise LLM routing, minus the enterprise subscription. Deploy caching and fallback strategies directly to your own infrastructure.
+            </p>
           </div>
-          <div className="flex gap-8 font-medium text-sm">
-            <Link href="/docs/introduction" className="text-[#888888] hover:text-white transition-colors">Docs</Link>
-            <a href="https://github.com/you/ai-gateway" className="text-[#888888] hover:text-white transition-colors">GitHub</a>
-            <Link href="/pricing" className="text-[#888888] hover:text-white transition-colors">Pricing</Link>
+          <div>
+            <h4 className="text-white font-medium mb-4 text-sm">Product</h4>
+            <ul className="space-y-3 text-sm">
+              <li><Link href="/pricing" className="text-[#888888] hover:text-white transition-colors">Pricing</Link></li>
+              <li><a href="https://github.com/you/ai-gateway" className="text-[#888888] hover:text-white transition-colors">Open Source</a></li>
+              <li><Link href="/docs/introduction" className="text-[#888888] hover:text-white transition-colors">Changelog</Link></li>
+            </ul>
           </div>
+          <div>
+            <h4 className="text-white font-medium mb-4 text-sm">Resources</h4>
+            <ul className="space-y-3 text-sm">
+              <li><Link href="/docs/introduction" className="text-[#888888] hover:text-white transition-colors">Documentation</Link></li>
+              <li><Link href="/docs/quick-start" className="text-[#888888] hover:text-white transition-colors">Quick Start</Link></li>
+              <li><a href="https://railway.app" className="text-[#888888] hover:text-white transition-colors">Deploy to Railway</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-medium mb-4 text-sm">Company</h4>
+            <ul className="space-y-3 text-sm">
+              <li><a href="https://twitter.com" className="text-[#888888] hover:text-white transition-colors">Twitter / X</a></li>
+              <li><a href="mailto:hello@ai-gateway.dev" className="text-[#888888] hover:text-white transition-colors">Contact</a></li>
+              <li><a href="https://github.com/you/ai-gateway/blob/main/LICENSE" className="text-[#888888] hover:text-white transition-colors">License</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-sm text-[#555555]">
-            © {new Date().getFullYear()} AI Gateway — MIT Licensed
+            © {new Date().getFullYear()} AI Gateway — MIT Licensed Project
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#27c93f]"></span>
+            <span className="text-xs font-medium text-[#888888] uppercase tracking-wider">All Systems Normal</span>
           </div>
         </div>
       </footer>

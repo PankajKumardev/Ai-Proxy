@@ -1,5 +1,6 @@
 import Link from "next/link"
 import type { Metadata } from "next"
+import { Check, X } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "Pricing — AI Gateway",
@@ -10,9 +11,9 @@ const plans = [
   {
     name: "Free",
     price: "$0",
-    period: "/month",
+    period: "/mo",
     desc: "Perfect for solo developers evaluating the gateway.",
-    cta: "Get Started",
+    cta: "Start for Free",
     href: "/signup",
     featured: false,
     features: [
@@ -32,7 +33,7 @@ const plans = [
   {
     name: "Pro",
     price: "$29",
-    period: "/month",
+    period: "/mo",
     desc: "For production apps that need reliability and cost control.",
     cta: "Start Pro Trial",
     href: "/signup?plan=pro",
@@ -44,11 +45,11 @@ const plans = [
       { label: "7-day cache TTL", included: true },
       { label: "90-day log retention", included: true },
       { label: "Dashboard access", included: true },
-      { label: "Fallback routing ✅", included: true },
-      { label: "cheap / balanced / quality routing ✅", included: true },
-      { label: "Priority support ✅", included: true },
+      { label: "Fallback routing", included: true },
+      { label: "cheap / balanced / quality routing", included: true },
+      { label: "Priority support", included: true },
       { label: "SSO / SAML", included: false },
-      { label: "99.9% SLA ✅", included: true },
+      { label: "99.9% SLA", included: true },
     ],
   },
   {
@@ -66,11 +67,11 @@ const plans = [
       { label: "Custom cache TTL", included: true },
       { label: "1-year log retention", included: true },
       { label: "Dashboard access", included: true },
-      { label: "Fallback routing ✅", included: true },
-      { label: "Custom routing strategies ✅", included: true },
-      { label: "Dedicated support ✅", included: true },
-      { label: "SSO / SAML ✅", included: true },
-      { label: "99.99% SLA ✅", included: true },
+      { label: "Fallback routing", included: true },
+      { label: "Custom routing strategies", included: true },
+      { label: "Dedicated support", included: true },
+      { label: "SSO / SAML", included: true },
+      { label: "99.99% SLA", included: true },
     ],
   },
 ]
@@ -104,84 +105,55 @@ const faqs = [
 
 export default function PricingPage() {
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "80px 24px" }}>
-      <div style={{ textAlign: "center", marginBottom: "72px" }}>
-        <h1 style={{ fontSize: "56px", fontWeight: 800, color: "white", marginBottom: "16px" }}>
+    <div className="pt-32 pb-24 px-6 max-w-6xl mx-auto">
+      <div className="text-center mb-16">
+        <h1 className="text-5xl md:text-6xl font-medium tracking-tighter text-white mb-6">
           Simple, transparent pricing
         </h1>
-        <p style={{ fontSize: "20px", color: "rgba(255,255,255,0.6)" }}>
-          Start free. Scale when you&apos;re ready.
+        <p className="text-xl text-[#a3a3a3]">
+          Start free. Scale when you're ready.
         </p>
       </div>
 
       {/* Plan cards */}
-      <div style={{ display: "flex", gap: "24px", justifyContent: "center", flexWrap: "wrap", marginBottom: "80px" }}>
+      <div className="grid md:grid-cols-3 gap-6 items-stretch max-w-5xl mx-auto text-left mb-24">
         {plans.map((plan) => (
           <div
             key={plan.name}
-            style={{
-              background: plan.featured ? "linear-gradient(135deg, rgba(168,85,247,0.12), rgba(59,130,246,0.12))" : "rgba(255,255,255,0.03)",
-              border: `1px solid ${plan.featured ? "rgba(168,85,247,0.5)" : "rgba(255,255,255,0.08)"}`,
-              borderRadius: "20px",
-              padding: "36px",
-              flex: "1 1 280px",
-              maxWidth: "340px",
-              position: "relative",
-              boxShadow: plan.featured ? "0 0 60px rgba(168,85,247,0.1)" : "none",
-            }}
+            className={`relative flex flex-col p-8 rounded-xl transition-all ${
+              plan.featured 
+                ? "bg-[#111111] border border-white/20 shadow-2xl z-10 md:scale-105" 
+                : "bg-black border border-white/10 opacity-80 hover:opacity-100"
+            }`}
           >
-            {plan.featured && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "-12px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  background: "linear-gradient(135deg, #a855f7, #3b82f6)",
-                  color: "white",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  padding: "4px 16px",
-                  borderRadius: "100px",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                ⭐ Most Popular
-              </div>
-            )}
-            <h2 style={{ fontSize: "24px", fontWeight: 800, color: "white", marginBottom: "8px" }}>{plan.name}</h2>
-            <div style={{ marginBottom: "12px" }}>
-              <span style={{ fontSize: "48px", fontWeight: 800, color: "#a855f7" }}>{plan.price}</span>
-              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "16px" }}>{plan.period}</span>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xl font-medium text-white">{plan.name}</span>
+              {plan.featured && (
+                <span className="text-[10px] uppercase font-bold tracking-widest bg-white text-black px-2 py-0.5 rounded-sm">Popular</span>
+              )}
             </div>
-            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "14px", marginBottom: "28px", lineHeight: 1.5 }}>{plan.desc}</p>
+            <div className="flex items-baseline gap-1 mb-2">
+              <span className="text-4xl font-medium tracking-tighter text-white">{plan.price}</span>
+              {plan.price !== "Custom" && <span className="text-[#a3a3a3] font-medium text-sm">{plan.period}</span>}
+            </div>
+            <p className="text-sm text-[#888888] mb-8 flex-1">{plan.desc}</p>
+            
             <Link
               href={plan.href}
-              style={{
-                display: "block",
-                textAlign: "center",
-                background: plan.featured ? "linear-gradient(135deg, #a855f7, #3b82f6)" : "rgba(255,255,255,0.08)",
-                color: "white",
-                padding: "14px",
-                borderRadius: "10px",
-                textDecoration: "none",
-                fontWeight: 700,
-                fontSize: "15px",
-                marginBottom: "28px",
-                boxShadow: plan.featured ? "0 4px 20px rgba(147,51,234,0.3)" : "none",
-              }}
+              className={`inline-flex items-center justify-center shrink-0 transition-transform hover:scale-[0.98] w-full rounded-md h-10 px-4 text-sm font-semibold mb-8 ${
+                plan.featured ? "bg-white text-black" : "border border-white/20 bg-transparent text-white hover:bg-white/10"
+              }`}
             >
               {plan.cta}
             </Link>
-            <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "24px" }}>
-              {plan.features.map((f) => (
-                <div key={f.label} style={{ display: "flex", alignItems: "flex-start", gap: "10px", marginBottom: "12px" }}>
-                  <span style={{ color: f.included ? "#a855f7" : "rgba(255,255,255,0.2)", fontSize: "16px", flexShrink: 0, marginTop: "1px" }}>
-                    {f.included ? "✓" : "✗"}
-                  </span>
-                  <span style={{ color: f.included ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.3)", fontSize: "14px", lineHeight: 1.4 }}>
+
+            <div className="border-t border-white/10 pt-6 space-y-3">
+              {plan.features.map((f, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className={`mt-0.5 flex-shrink-0 ${f.included ? "text-white" : "text-[#333333]"}`}>
+                    {f.included ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                  </div>
+                  <span className={`text-sm leading-tight ${f.included ? "text-[#d4d4d4]" : "text-[#555555]"}`}>
                     {f.label}
                   </span>
                 </div>
@@ -192,23 +164,19 @@ export default function PricingPage() {
       </div>
 
       {/* FAQ */}
-      <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-        <h2 style={{ fontSize: "36px", fontWeight: 800, color: "white", textAlign: "center", marginBottom: "48px" }}>FAQ</h2>
-        {faqs.map((faq) => (
-          <div
-            key={faq.q}
-            style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "12px",
-              padding: "24px",
-              marginBottom: "16px",
-            }}
-          >
-            <h3 style={{ fontSize: "16px", fontWeight: 700, color: "white", marginBottom: "10px" }}>{faq.q}</h3>
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "15px", lineHeight: 1.6, margin: 0 }}>{faq.a}</p>
-          </div>
-        ))}
+      <div className="max-w-3xl mx-auto">
+        <h2 className="text-3xl font-medium tracking-tighter text-white text-center mb-10">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          {faqs.map((faq) => (
+            <div
+              key={faq.q}
+              className="bg-[#111111] border border-white/10 rounded-xl p-6 hover:bg-[#161616] transition-colors"
+            >
+              <h3 className="text-base font-medium text-white mb-2">{faq.q}</h3>
+              <p className="text-[#a3a3a3] text-sm leading-relaxed m-0">{faq.a}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
