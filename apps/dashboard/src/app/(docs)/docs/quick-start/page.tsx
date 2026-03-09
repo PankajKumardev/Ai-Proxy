@@ -1,6 +1,7 @@
 import React from "react"
 import type { Metadata } from "next"
 import CodeBlock from "@/components/mdx/code-block"
+import { Check } from "lucide-react"
 
 export const metadata: Metadata = { title: "Quick Start — AI Gateway Docs" }
 
@@ -109,15 +110,18 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)`} 
       />
 
-      <div className="not-prose mt-12 mb-8 bg-primary/10 border border-primary/20 rounded-xl p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-2 font-semibold text-primary">
-          <span>⚡</span>
-          <h4>That's it!</h4>
+      <div className="not-prose my-12 bg-[#111111] border border-white/10 rounded-xl p-6 relative overflow-hidden flex gap-4 shadow-2xl">
+        <div className="w-1.5 absolute left-0 top-0 bottom-0 bg-white rounded-l-xl"></div>
+        <div className="mt-0.5 flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-white shadow-inner shadow-white/5 border border-white/20">
+          <Check className="w-3.5 h-3.5 text-white" />
         </div>
-        <p className="text-sm text-foreground/80 m-0 leading-relaxed">
-          Make the same request twice — the second call returns instantly from cache and costs $0.00.
-          Check the dashboard at <code className="bg-primary/5 px-1 py-0.5 rounded text-primary">/dashboard</code> to see usage data.
-        </p>
+        <div>
+          <h4 className="font-semibold text-white mb-2">That's it!</h4>
+          <p className="text-[14px] text-[#888888] leading-relaxed m-0">
+            Make the same request twice — the second call returns instantly from cache and costs $0.00.
+            Check the dashboard at <code className="text-[#d4d4d4] bg-white/5 border border-white/10 px-1.5 py-0.5 rounded font-mono text-[12px]">/dashboard</code> to see usage data.
+          </p>
+        </div>
       </div>
     </>
   )

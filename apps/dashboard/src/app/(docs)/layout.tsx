@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import TableOfContents from "@/components/mdx/toc"
 
 const nav = [
   {
@@ -98,21 +99,13 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
         {/* Dynamic Prose Content */}
         <main className="flex-1 min-w-0 py-10 px-6 md:px-12 lg:px-16 overflow-x-hidden">
-          <div className="prose prose-invert prose-zinc max-w-3xl prose-pre:bg-[#111111] prose-pre:border prose-pre:border-white/10 prose-pre:text-[13px]">
+          <div className="prose prose-invert prose-zinc max-w-3xl prose-pre:bg-[#111111] prose-pre:border prose-pre:border-white/10 prose-pre:text-[13px] prose-h2:scroll-mt-24 prose-h3:scroll-mt-24">
             {children}
           </div>
         </main>
 
-        {/* Right TOC Placeholder */}
-        <aside className="w-[200px] shrink-0 py-10 px-4 hidden xl:block sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
-          <div className="text-[11px] font-bold text-[#555555] uppercase tracking-wider mb-4">On this page</div>
-          <div className="space-y-2 text-[13px] text-[#888888]">
-            <p className="hover:text-white cursor-pointer transition-colors">Overview</p>
-            <p className="hover:text-white cursor-pointer transition-colors">Architecture</p>
-            <p className="hover:text-white cursor-pointer transition-colors">Supported Models</p>
-            <p className="hover:text-white cursor-pointer transition-colors">Tech Stack</p>
-          </div>
-        </aside>
+        {/* Dynamic Right TOC */}
+        <TableOfContents />
       </div>
     </div>
   )
