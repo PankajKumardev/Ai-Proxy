@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  plan         String     @default("free") // "free" | "pro" | "enterprise"
+  quotaUsed    Int        @default(0) // requests used this month
+  quotaResetAt DateTime   @default(now()) // resets 1st of each month UTC
+  createdAt    DateTime   @default(now())
+  apiKeys      ApiKey[]
+  usageLogs    UsageLog[]
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  keyHash   String   @unique // SHA-256 hash — NEVER store plaintext
+  name      String   @default("Default Key")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model UsageLog {
+  id           String   @id @default(cuid())
+  requestId    String // X-Request-ID for debugging
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider     String
+  model        String
+  tokens       Int
+  cost         Float
+  cacheHit     Boolean
+  latencyMs    Int // total request duration
+  promptJson   String? // JSON string of messages array — nullable, opt-in
+  responseJson String? // JSON string of response choices — nullable
+  timestamp    DateTime @default(now())
+
+  // Composite index — dashboard queries always filter by userId + timestamp range.
+  // Without this, Postgres does a full table scan once logs hit millions of rows.
+  @@index([userId, timestamp])
+}

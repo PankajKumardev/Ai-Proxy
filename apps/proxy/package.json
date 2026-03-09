@@ -1,0 +1,28 @@
+{
+  "name": "@ai-gateway/proxy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "hono": "^4.12.5",
+    "@hono/node-server": "^1.19.11",
+    "@upstash/redis": "^1.36.4",
+    "@upstash/ratelimit": "^2.0.8",
+    "@prisma/client": "^7.4.2",
+    "@ai-gateway/cache": "*",
+    "@ai-gateway/providers": "*",
+    "@ai-gateway/logger": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^25.3.5",
+    "tsx": "^4.21.0",
+    "prisma": "^7.4.2"
+  }
+}

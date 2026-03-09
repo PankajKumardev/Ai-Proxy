@@ -1,0 +1,31 @@
+FROM node:22-alpine AS base
+WORKDIR /app
+
+# Install dependencies
+FROM base AS deps
+COPY package*.json ./
+COPY apps/proxy/package*.json ./apps/proxy/
+COPY packages/cache/package*.json ./packages/cache/
+COPY packages/providers/package*.json ./packages/providers/
+COPY packages/logger/package*.json ./packages/logger/
+RUN npm install --workspaces
+
+# Build
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npx prisma generate
+RUN npm run build --workspace=packages/cache
+RUN npm run build --workspace=packages/providers
+RUN npm run build --workspace=packages/logger
+RUN npm run build --workspace=apps/proxy
+
+# Production runner
+FROM base AS runner
+COPY --from=builder /app/apps/proxy/dist ./apps/proxy/dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
+  CMD wget -qO- http://localhost:3000/health || exit 1
+CMD ["node", "apps/proxy/dist/index.js"]
