@@ -44,7 +44,6 @@ export default async function KeysPage({
   const keys = await prisma.apiKey.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
-    include: { _count: false },
   })
 
   return (

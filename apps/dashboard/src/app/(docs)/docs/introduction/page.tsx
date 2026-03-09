@@ -1,3 +1,4 @@
+import React from "react"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = { title: "Introduction — AI Gateway Docs" }
@@ -51,12 +52,12 @@ export default function IntroductionPage() {
           ["claude-sonnet-4-6",  "Anthropic", "$3.00",  "$15.00"],
           ["claude-haiku-4-5",   "Anthropic", "$1.00",  "$5.00"],
         ].map(([model, provider, inp, out], i) => (
-          <>
-            <div key={`m${i}`} style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "rgba(255,255,255,0.85)", fontWeight: i === 0 ? 700 : 500, borderBottom: "1px solid rgba(255,255,255,0.05)", fontFamily: "monospace" }}>{model}</div>
-            <div key={`p${i}`} style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "rgba(255,255,255,0.55)", fontWeight: i === 0 ? 700 : 400, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{provider}</div>
-            <div key={`i${i}`} style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "#10b981", fontWeight: i === 0 ? 700 : 500, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{inp}</div>
-            <div key={`o${i}`} style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "#f59e0b", fontWeight: i === 0 ? 700 : 500, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{out}</div>
-          </>
+          <React.Fragment key={i}>
+            <div style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "rgba(255,255,255,0.85)", fontWeight: i === 0 ? 700 : 500, borderBottom: "1px solid rgba(255,255,255,0.05)", fontFamily: "monospace" }}>{model}</div>
+            <div style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "rgba(255,255,255,0.55)", fontWeight: i === 0 ? 700 : 400, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{provider}</div>
+            <div style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "#10b981", fontWeight: i === 0 ? 700 : 500, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{inp}</div>
+            <div style={{ padding: "10px 14px", background: i === 0 ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.02)", color: i === 0 ? "#a855f7" : "#f59e0b", fontWeight: i === 0 ? 700 : 500, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{out}</div>
+          </React.Fragment>
         ))}
       </div>
 
@@ -68,11 +69,11 @@ export default function IntroductionPage() {
           ["Upstash Redis", "HTTP-based Redis for caching + rate limiting"],
           ["Next.js 16 App Router", "Landing page, docs, and dashboard in one app"],
           ["NextAuth v4", "JWT sessions, Prisma adapter, email/password auth"],
-        ].map(([tool, why]) => (
-          <>
-            <div key={`t-${tool}`} style={{ padding: "12px 16px", background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.9)", fontWeight: 600, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{tool}</div>
-            <div key={`w-${tool}`} style={{ padding: "12px 16px", color: "rgba(255,255,255,0.6)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{why}</div>
-          </>
+        ].map(([tool, why], i) => (
+          <React.Fragment key={i}>
+            <div style={{ padding: "12px 16px", background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.9)", fontWeight: 600, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{tool}</div>
+            <div style={{ padding: "12px 16px", color: "rgba(255,255,255,0.6)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>{why}</div>
+          </React.Fragment>
         ))}
       </div>
     </>
