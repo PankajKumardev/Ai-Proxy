@@ -38,22 +38,27 @@ AI Gateway solves all three instantly through a single unified endpoint.
 
 The gateway operates on a high-throughput, horizontally scalable stateless architecture.
 
-```text
-        [ Client Application ]
-                 |
-                 | POST /v1/chat/completions
-                 v
-        [   AI Gateway Edge      ]
-        | 1. Authentication      |
-        | 2. Quota Management    |
-        | 3. SHA-256 Edge Cache  |
-        | 4. Smart Routing logic |
-        | 5. Stream Multiplexing |
-        | 6. Async Postgres Log  |
-                 |
-    +------------+------------+
-    v            v            v
- [OpenAI]     [Gemini]    [Anthropic]
+```mermaid
+graph TD
+    classDef client fill:#f9f9f9,stroke:#333,stroke-width:2px,color:#333
+    classDef proxy fill:#111111,stroke:#4caf50,stroke-width:2px,color:#fff
+    classDef component fill:#222222,stroke:#555,stroke-width:1px,color:#ddd
+    classDef provider fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+
+    Client["Client Application"]:::client -->|POST /v1/chat/completions| Gateway
+
+    subgraph Gateway ["AI Gateway Edge"]
+        direction TB
+        Auth["1. Authentication"]:::component --> Quota["2. Quota Management"]:::component
+        Quota --> Cache["3. SHA-256 Edge Cache"]:::component
+        Cache --> Logic["4. Smart Routing Logic"]:::component
+        Logic --> Stream["5. Stream Multiplexing"]:::component
+        Stream --> db[("6. Async Postgres Log")]:::component
+    end
+
+    Gateway -->|Primary / Fallback| OpenAI["OpenAI"]:::provider
+    Gateway -->|Primary / Fallback| Gemini["Gemini"]:::provider
+    Gateway -->|Primary / Fallback| Anthropic["Anthropic"]:::provider
 ```
 
 At its core, the proxy acts as a reverse proxy multiplexer. It standardizes outgoing payloads, evaluates them against the Upstash Redis Edge cache, and if an identical prompt signature is not found, dynamically routes the request upstream based on the current active routing policy.
@@ -73,14 +78,14 @@ Security is enforced at the network, application, and database levels:
 
 ## Technology Stack
 
-The project is structured as a modern pnpm monorepo, utilizing the latest enterprise-grade web frameworks and infrastructure setups:
-
-- **Proxy Engine:** Hono (Node.js / Edge compatible) for sub-10ms overhead routing.
-- **Dashboard Application:** Next.js 16 (App Router) with React Server Components.
-- **Styling & Components:** Tailwind CSS v4, custom shadcn/ui primitives.
-- **Database Architecture:** PostgreSQL (Neon Serverless via connection pooling) accessed via Prisma 7 Object Relational Mapping.
-- **Caching Layer:** Upstash Redis (REST API) for exact-match response serving and rate limiting architectures.
-- **Authentication Workflow:** NextAuth.js combined with bcrypt cryptographic hashing.
+| Component          | Technology        | Description                                                                       |
+| :----------------- | :---------------- | :-------------------------------------------------------------------------------- |
+| **Proxy Engine**   | `Hono`            | Node.js / Edge compatible framework for sub-10ms overhead routing.                |
+| **Dashboard**      | `Next.js 16`      | App Router with React Server Components for the UI and Docs.                      |
+| **Styling**        | `Tailwind CSS v4` | Combined with custom `shadcn/ui` primitives for an enterprise aesthetic.          |
+| **Database**       | `PostgreSQL`      | Neon Serverless via connection pooling, accessed via `Prisma 7` ORM.              |
+| **Caching Layer**  | `Upstash Redis`   | Global REST API for exact-match response serving and rate limiting architectures. |
+| **Authentication** | `NextAuth.js`     | Combined with `bcrypt` cryptographic hashing for secure session management.       |
 
 ---
 
