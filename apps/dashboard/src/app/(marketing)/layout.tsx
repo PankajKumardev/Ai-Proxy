@@ -7,13 +7,13 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <header className="fixed top-0 inset-x-0 z-50 border-b border-white/10 bg-[#0A0A0A]/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 font-bold tracking-widest uppercase text-white hover:opacity-80 transition-opacity text-sm">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> 
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             AI Gateway
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
             <Link href="/docs/introduction" className="text-[#a3a3a3] hover:text-white transition-colors">Docs</Link>
             <Link href="/pricing" className="text-[#a3a3a3] hover:text-white transition-colors">Pricing</Link>
-            <a href="https://github.com/you/ai-gateway" className="text-[#a3a3a3] hover:text-white transition-colors">GitHub</a>
+            <a href="https://github.com/pankajkumardev/ai-Proxy" target="_blank" className="text-[#a3a3a3] hover:text-white transition-colors">GitHub</a>
           </nav>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-sm font-medium text-[#a3a3a3] hover:text-white transition-colors hidden sm:block">
@@ -33,7 +33,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16">
           <div className="col-span-2 lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 font-bold tracking-widest uppercase text-white mb-4 text-sm">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> 
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
               AI Gateway
             </Link>
             <p className="text-sm text-[#888888] leading-relaxed max-w-xs">
@@ -44,7 +44,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             <h4 className="text-white font-medium mb-4 text-sm">Product</h4>
             <ul className="space-y-3 text-sm">
               <li><Link href="/pricing" className="text-[#888888] hover:text-white transition-colors">Pricing</Link></li>
-              <li><a href="https://github.com/you/ai-gateway" className="text-[#888888] hover:text-white transition-colors">Open Source</a></li>
+              <li><a href="http://github.com/pankajkumardev/ai-Proxy" className="text-[#888888] hover:text-white transition-colors" target="_blank">Open Source</a></li>
               <li><Link href="/docs/introduction" className="text-[#888888] hover:text-white transition-colors">Changelog</Link></li>
             </ul>
           </div>
@@ -59,15 +59,15 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <div>
             <h4 className="text-white font-medium mb-4 text-sm">Company</h4>
             <ul className="space-y-3 text-sm">
-              <li><a href="https://twitter.com" className="text-[#888888] hover:text-white transition-colors">Twitter / X</a></li>
-              <li><a href="mailto:hello@ai-gateway.dev" className="text-[#888888] hover:text-white transition-colors">Contact</a></li>
-              <li><a href="https://github.com/you/ai-gateway/blob/main/LICENSE" className="text-[#888888] hover:text-white transition-colors">License</a></li>
+              <li><a href="https://twitter.com/pankajkumar_dev" className="text-[#888888] hover:text-white transition-colors" target="_blank">Twitter / X</a></li>
+              <li><a href="mailto:pankajams1234@gmail.com" className="text-[#888888] hover:text-white transition-colors" target="_blank">Contact</a></li>
+              <li><a href="https://github.com/pankajkumardev/ai-Proxy/blob/main/LICENSE" className="text-[#888888] hover:text-white transition-colors" target="_blank">License</a></li>
             </ul>
           </div>
         </div>
         <div className="max-w-6xl mx-auto border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-sm text-[#555555]">
-            © {new Date().getFullYear()} AI Gateway — MIT Licensed Project
+            © {new Date().getFullYear()} AI Gateway - MIT Licensed Project
           </div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#27c93f]"></span>

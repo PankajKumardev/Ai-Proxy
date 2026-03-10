@@ -38,7 +38,7 @@ export default function AppLayoutClient({ children, userEmail }: { children: Rea
   const currentLink = sidebarLinks.find((l) => l.href === pathname)
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] text-foreground antialiased selection:bg-white/20 selection:text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-foreground antialiased">
       {/* Sidebar */}
       <aside
         className={cn(

@@ -1,12 +1,10 @@
-import Link from "next/link"
-import type { Metadata } from "next"
-import { Check, X } from "lucide-react"
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Pricing — AI Gateway",
-  description: "Simple, transparent pricing. Start free. Scale when you're ready.",
-}
+import Link from "next/link";
+import { Check, X } from "lucide-react";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 const plans = [
   {
@@ -75,7 +73,7 @@ const plans = [
       { label: "99.99% SLA", included: true },
     ],
   },
-]
+];
 
 const faqs = [
   {
@@ -102,84 +100,115 @@ const faqs = [
     q: "Can I switch providers at any time?",
     a: "Yes. Use the X-AI-Gateway-Mode header to choose cheap, balanced, or quality routing per request. No code changes, no redeployment.",
   },
-]
+];
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } }
+};
 
 export default function PricingPage() {
   return (
     <div className="pt-32 pb-24 px-6 max-w-6xl mx-auto">
-      <div className="text-center mb-16">
-        <h1 className="text-5xl md:text-6xl font-medium tracking-tighter text-white mb-6">
+      <motion.div 
+        initial="hidden"
+        animate="visible"
+        variants={fadeInUp}
+        className="text-center mb-16"
+      >
+        <h1 className="text-5xl md:text-6xl font-semibold tracking-tight text-white mb-6">
           Simple, transparent pricing
         </h1>
         <p className="text-xl text-[#a3a3a3]">
           Start free. Scale when you're ready.
         </p>
-      </div>
+      </motion.div>
 
       {/* Plan cards */}
-      <div className="grid md:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto text-left mb-24">
+      <motion.div 
+        initial="hidden"
+        animate="visible"
+        variants={fadeInUp}
+        className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto text-left mb-24 items-stretch"
+      >
         {plans.map((plan) => (
           <div
             key={plan.name}
-            className={`relative flex flex-col p-10 rounded-2xl transition-all ${
+            className={cn(
+              "group/plan relative flex flex-col p-8 rounded-xl bg-[#0A0A0A] transition-all duration-300 hover:-translate-y-2 hover:border-white/20", 
               plan.featured 
-                ? "bg-[#111111] border border-white/20 shadow-2xl z-10 md:scale-105 ring-1 ring-white/10" 
-                : "bg-black border border-white/10 opacity-80 hover:opacity-100"
-            }`}
+                ? "border border-white/40 shadow-[0_0_30px_-10px_rgba(255,255,255,0.2)] z-10 hover:shadow-[0_0_40px_-5px_rgba(255,255,255,0.3)]" 
+                : "border border-white/10"
+            )}
           >
             <div className="flex items-center justify-between mb-6">
-              <span className="text-2xl font-medium text-white">{plan.name}</span>
-              {plan.featured && (
-                <span className="text-xs uppercase font-bold tracking-widest bg-white text-black px-3 py-1 rounded">Popular</span>
-              )}
+              <span className="text-xl font-semibold text-white">{plan.name}</span>
+              {plan.featured && <span className="text-[10px] uppercase font-bold tracking-widest bg-white/20 text-white px-2 py-1 rounded-sm">Popular</span>}
             </div>
-            <div className="flex items-baseline gap-1 mb-4">
-              <span className="text-5xl font-medium tracking-tighter text-white">{plan.price}</span>
-              {plan.price !== "Custom" && <span className="text-[#a3a3a3] font-medium text-base">{plan.period}</span>}
+            <div className="flex items-baseline gap-1 mb-2">
+              <span className="text-4xl font-semibold tracking-tight text-white">{plan.price}</span>
+              {plan.price !== "Custom" && <span className="text-neutral-500 font-medium text-sm">{plan.period}</span>}
             </div>
-            <p className="text-base text-[#888888] mb-10 flex-1">{plan.desc}</p>
+            <p className="text-sm text-neutral-400 mb-8 flex-1">{plan.desc}</p>
             
             <Link
               href={plan.href}
-              className={`inline-flex items-center justify-center shrink-0 transition-transform hover:scale-[0.98] w-full rounded-lg h-14 px-6 text-base font-semibold mb-10 ${
-                plan.featured ? "bg-white text-black shadow-lg shadow-white/5" : "border border-white/20 bg-transparent text-white hover:bg-white/10"
-              }`}
+              className={cn("relative overflow-hidden inline-flex items-center justify-center shrink-0 transition-transform hover:scale-[0.98] w-full rounded-md h-10 px-4 text-sm font-medium mb-8", plan.featured ? "bg-white text-black hover:bg-neutral-200" : "bg-white/5 border border-white/10 text-white hover:bg-white/10")}
             >
-              {plan.cta}
+              {/* Sheen effect on hover */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[200%] group-hover/plan:translate-x-[200%] transition-transform duration-1000 ease-in-out" />
+              <span className="relative z-10">{plan.cta}</span>
             </Link>
 
-            <div className="border-t border-white/10 pt-8 space-y-4">
+            <div className="pt-6 border-t border-white/5 space-y-3 flex-1">
               {plan.features.map((f, i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <div className={`flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full ${f.included ? "bg-white/10 text-white" : "bg-transparent text-[#333333]"}`}>
-                    {f.included ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
-                  </div>
-                  <span className={`text-[15px] leading-tight ${f.included ? "text-[#d4d4d4]" : "text-[#555555] line-through decoration-[#333]"}`}>
-                    {f.label}
-                  </span>
+                <div key={i} className={cn("flex items-center gap-3", !f.included && "opacity-50")}>
+                  {f.included ? (
+                    <Check className="w-4 h-4 text-neutral-500" />
+                  ) : (
+                    <X className="w-4 h-4 text-neutral-700" />
+                  )}
+                  <span className="text-sm text-neutral-300">{f.label}</span>
                 </div>
               ))}
             </div>
           </div>
         ))}
-      </div>
+      </motion.div>
 
-      {/* FAQ */}
-      <div className="max-w-3xl mx-auto">
-        <h2 className="text-3xl font-medium tracking-tighter text-white text-center mb-10">Frequently Asked Questions</h2>
-        <Accordion className="w-full">
+      {/* FAQ & Bottom CTA */}
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={fadeInUp}
+        className="py-24 px-6 max-w-2xl mx-auto border-t border-white/10"
+      >
+        <h2 className="text-3xl font-semibold tracking-tight text-white mb-8 text-center">Frequently asked questions</h2>
+        
+        <Accordion className="w-full mb-32 transition-all duration-150">
           {faqs.map((faq, i) => (
-            <AccordionItem key={i} value={`item-${i}`} className="bg-[#111111] border-x border-t border-b border-white/10 rounded-2xl px-6 sm:px-8 mb-4 hover:bg-[#161616] transition-colors data-[open]:bg-[#161616] tracking-tight group/item">
-              <AccordionTrigger className="group flex flex-1 w-full items-center justify-between text-left text-base sm:text-lg font-medium text-white hover:no-underline py-6">
+            <AccordionItem key={i} value={`item-${i}`} className="border-b border-white/10 py-2 transition-all">
+              <AccordionTrigger className="text-left text-base font-medium text-white hover:no-underline hover:text-neutral-300 transition-colors">
                 {faq.q}
               </AccordionTrigger>
-              <AccordionContent className="text-[#a3a3a3] text-[14px] sm:text-[15px] leading-relaxed pb-6 text-left">
+              <AccordionContent className="text-neutral-400 text-[14px] leading-relaxed pb-4 mt-2">
                 {faq.a}
               </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
-      </div>
+
+        <div className="text-center">
+          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-white mb-8">
+            Ready to stop burning API credits?
+          </h2>
+          <Link href="/signup" className="group relative overflow-hidden inline-flex items-center justify-center whitespace-nowrap transition-transform hover:scale-95 rounded-md bg-white text-black font-semibold h-14 px-10 text-lg shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-[200%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out" />
+            <span className="relative z-10">Get Started Free</span>
+          </Link>
+        </div>
+      </motion.section>
     </div>
   )
 }
