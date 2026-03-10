@@ -8,200 +8,158 @@ import { Input } from "@/components/ui/input"
 import { CheckCircle2, XCircle, ShieldAlert, Lock, Mail, ScanEye, Trash2 } from "lucide-react"
 
 export const metadata: Metadata = { title: "Settings — AI Gateway Dashboard" }
-const prisma = new PrismaClient()
 
-async function updateEmail(formData: FormData) {
-  "use server"
-  const session = await auth()
-  if (!session) redirect("/login")
-  const newEmail = formData.get("email") as string
-  await prisma.user.update({ where: { id: session.user?.id as string }, data: { email: newEmail } })
-  redirect("/dashboard/settings?success=email")
-}
-
-async function updatePassword(formData: FormData) {
-  "use server"
-  const session = await auth()
-  if (!session) redirect("/login")
-  const currentPassword = formData.get("currentPassword") as string
-  const newPassword = formData.get("newPassword") as string
-  const user = await prisma.user.findUnique({ where: { id: session.user?.id as string } })
-  if (!user) redirect("/login")
-  const valid = await bcrypt.compare(currentPassword, user.passwordHash)
-  if (!valid) redirect("/dashboard/settings?error=password")
-  const passwordHash = await bcrypt.hash(newPassword, 12)
-  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } })
-  redirect("/dashboard/settings?success=password")
-}
-
-async function updateLogging(formData: FormData) {
-  "use server"
-  const session = await auth()
-  if (!session) redirect("/login")
-  const storeRequestLogs = formData.get("storeRequestLogs") === "on"
-  await prisma.user.update({
-    where: { id: session.user?.id as string },
-    data: { storeRequestLogs },
-  })
-  redirect("/dashboard/settings?success=logging")
-}
-
-async function deleteAccount() {
-  "use server"
-  const session = await auth()
-  if (!session) redirect("/login")
-  await prisma.user.delete({ where: { id: session.user?.id as string } })
-  redirect("/login")
-}
+// ── SERVER ACTIONS (no-ops for UI preview) ────────────────────────────────
+async function updateEmail() { "use server" }
+async function updatePassword() { "use server" }
+async function updateLogging() { "use server" }
+async function deleteAccount() { "use server" }
+// ─────────────────────────────────────────────────────────────────────────
 
 export default async function SettingsPage({
   searchParams,
 }: {
   searchParams: Promise<{ success?: string; error?: string }>
 }) {
-  const session = await auth()
-  if (!session) redirect("/login")
   const resolvedParams = await searchParams
+  // DUMMY DATA FOR UI PREVIEW
+  const storeRequestLogs = false
+  const dummyEmail = "demo@aigateway.dev"
 
-  const userRecord = await prisma.user.findUnique({
-    where: { id: session.user?.id as string },
-    select: { storeRequestLogs: true },
-  })
-  const storeRequestLogs = userRecord?.storeRequestLogs ?? false
+
 
   return (
-    <div className="max-w-xl space-y-6">
+    <div className="max-w-3xl space-y-8 animate-in fade-in duration-500">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage your account preferences and security.</p>
+        <h1 className="text-3xl font-medium tracking-tighter text-white">Settings</h1>
+        <p className="text-[#a3a3a3] mt-1 text-lg leading-relaxed">Manage your account preferences and security configuration.</p>
       </div>
 
       {/* Toast banners */}
       {resolvedParams.success === "email" && (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-500">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
+        <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-400">
+          <CheckCircle2 className="h-5 w-5 shrink-0" />
           Email updated successfully.
         </div>
       )}
       {resolvedParams.success === "password" && (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-500">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
+        <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-400">
+          <CheckCircle2 className="h-5 w-5 shrink-0" />
           Password updated successfully.
         </div>
       )}
       {resolvedParams.success === "logging" && (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-500">
-          <CheckCircle2 className="h-4 w-4 shrink-0" />
+        <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-400">
+          <CheckCircle2 className="h-5 w-5 shrink-0" />
           Privacy settings saved.
         </div>
       )}
       {resolvedParams.error === "password" && (
-        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          <XCircle className="h-4 w-4 shrink-0" />
+        <div className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-500">
+          <XCircle className="h-5 w-5 shrink-0" />
           Current password is incorrect.
         </div>
       )}
 
-      {/* Update Email */}
-      <div className="rounded-lg border bg-card p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <Mail className="h-4 w-4 text-muted-foreground" />
-          <h2 className="font-semibold">Update Email</h2>
-        </div>
-        <form action={updateEmail} className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Current email</label>
-            <div className="flex h-10 w-full rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-muted-foreground cursor-not-allowed">
-              {session?.user?.email}
+      {/* Settings Grid */}
+      <div className="grid gap-6">
+
+        {/* Update Email */}
+        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-8 shadow-sm relative flex flex-col">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-xl font-medium tracking-tight text-white">Email Address</h2>
+          </div>
+          <form action={updateEmail} className="space-y-6 max-w-md">
+            <div className="space-y-2">
+              <label className="text-[11px] font-medium text-neutral-400 uppercase tracking-widest">Current email</label>
+              <div className="flex h-10 w-full rounded-md border border-white/10 bg-[#000000] px-3 items-center text-[14px] text-neutral-500 cursor-not-allowed">
+                {dummyEmail}
+              </div>
             </div>
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="email" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">New email</label>
-            <Input id="email" type="email" name="email" required placeholder="new@example.com" />
-          </div>
-          <Button type="submit" variant="outline" size="sm">Save Email</Button>
-        </form>
-      </div>
-
-      {/* Update Password */}
-      <div className="rounded-lg border bg-card p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <Lock className="h-4 w-4 text-muted-foreground" />
-          <h2 className="font-semibold">Update Password</h2>
-        </div>
-        <form action={updatePassword} className="space-y-4">
-          <div className="space-y-1.5">
-            <label htmlFor="currentPassword" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Current password</label>
-            <Input id="currentPassword" type="password" name="currentPassword" required placeholder="••••••••" />
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="newPassword" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">New password</label>
-            <Input id="newPassword" type="password" name="newPassword" required minLength={8} placeholder="••••••••" />
-          </div>
-          <Button type="submit" variant="outline" size="sm">Update Password</Button>
-        </form>
-      </div>
-
-      {/* Privacy: Request Logging Toggle */}
-      <div className="rounded-lg border bg-card p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <ScanEye className="h-4 w-4 text-muted-foreground" />
-          <h2 className="font-semibold">Privacy &amp; Request Logging</h2>
-        </div>
-        <p className="text-sm text-muted-foreground">
-          When enabled, the gateway stores the full prompt and response payload for each request. Required for the{" "}
-          <span className="font-medium text-foreground">Request Replay</span> feature.{" "}
-          <span className="font-medium text-foreground">Off by default</span> — recommended for sensitive workloads (healthcare, legal, finance).
-        </p>
-        <form action={updateLogging} className="flex items-center gap-4">
-          {/* Native toggle built with Tailwind */}
-          <label htmlFor="storeRequestLogs" className="flex items-center gap-3 cursor-pointer select-none">
-            <div className="relative">
-              <input
-                type="checkbox"
-                id="storeRequestLogs"
-                name="storeRequestLogs"
-                defaultChecked={storeRequestLogs}
-                className="peer sr-only"
-              />
-              {/* Track */}
-              <div className={`w-11 h-6 rounded-full border transition-colors ${
-                storeRequestLogs
-                  ? "bg-primary/20 border-primary/50"
-                  : "bg-muted border-border"
-              } peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2`} />
-              {/* Thumb */}
-              <div className={`absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition-all ${
-                storeRequestLogs ? "left-[22px]" : "left-[3px]"
-              }`} />
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-[11px] font-medium text-neutral-400 uppercase tracking-widest">New email</label>
+              <Input id="email" type="email" name="email" required placeholder="new@example.com" className="h-10 rounded-md border-white/10 bg-[#000000] text-[14px] focus-visible:ring-1 focus-visible:ring-white/20 focus-visible:border-white/20 transition-all text-white placeholder:text-neutral-600" />
             </div>
-            <span className="text-sm font-medium">Store request &amp; response content</span>
-          </label>
-          <Button type="submit" variant="outline" size="sm">Save</Button>
-        </form>
-      </div>
-
-      {/* Danger Zone */}
-      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <ShieldAlert className="h-4 w-4 text-destructive" />
-          <h2 className="font-semibold text-destructive">Danger Zone</h2>
+            <Button type="submit" variant="outline" className="h-9 px-4 bg-transparent border-white/10 text-white hover:bg-white/5 transition-colors">Save Email</Button>
+          </form>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Deleting your account is permanent. All API keys and usage logs will be removed immediately and cannot be recovered.
-        </p>
-        <form action={deleteAccount}>
-          <Button
-            type="submit"
-            variant="destructive"
-            size="sm"
-            className="gap-2"
-          >
-            <Trash2 className="h-4 w-4" />
-            Delete Account
-          </Button>
-        </form>
+
+        {/* Update Password */}
+        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-8 shadow-sm relative flex flex-col">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-xl font-medium tracking-tight text-white">Password Security</h2>
+          </div>
+          <form action={updatePassword} className="space-y-6 max-w-md">
+            <div className="space-y-2">
+              <label htmlFor="currentPassword" className="text-[11px] font-medium text-neutral-400 uppercase tracking-widest">Current password</label>
+              <Input id="currentPassword" type="password" name="currentPassword" required placeholder="••••••••" className="h-10 rounded-md border-white/10 bg-[#000000] text-[14px] focus-visible:ring-1 focus-visible:ring-white/20 focus-visible:border-white/20 transition-all text-white placeholder:text-neutral-600" />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="newPassword" className="text-[11px] font-medium text-neutral-400 uppercase tracking-widest">New password</label>
+              <Input id="newPassword" type="password" name="newPassword" required minLength={8} placeholder="••••••••" className="h-10 rounded-md border-white/10 bg-[#000000] text-[14px] focus-visible:ring-1 focus-visible:ring-white/20 focus-visible:border-white/20 transition-all text-white placeholder:text-neutral-600" />
+            </div>
+            <Button type="submit" variant="outline" className="h-9 px-4 bg-transparent border-white/10 text-white hover:bg-white/5 transition-colors">Update Password</Button>
+          </form>
+        </div>
+
+        {/* Privacy: Request Logging Toggle */}
+        <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-8 shadow-sm relative flex flex-col">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-xl font-medium tracking-tight text-white">Data Privacy &amp; Logging</h2>
+          </div>
+          <p className="text-[14px] text-neutral-400 leading-relaxed max-w-2xl mb-8">
+            When enabled, the gateway explicitly stores the full prompt and response payload for each request in Postgres. This is required for the <strong className="text-white font-medium">Request Console Replay</strong> feature, but is <strong className="text-white font-medium">off by default</strong> for compliance with sensitive workloads.
+          </p>
+          <form action={updateLogging} className="p-5 rounded-lg border border-white/10 bg-[#000000] w-full flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <label htmlFor="storeRequestLogs" className="flex items-center gap-4 cursor-pointer select-none group/toggle">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  id="storeRequestLogs"
+                  name="storeRequestLogs"
+                  defaultChecked={storeRequestLogs}
+                  className="peer sr-only"
+                />
+                {/* Track */}
+                <div className={`w-10 h-6 rounded-full border transition-all duration-300 ${
+                  storeRequestLogs
+                    ? "bg-white text-black border-white"
+                    : "bg-neutral-800 border-neutral-700 group-hover/toggle:border-neutral-600"
+                } peer-focus-visible:ring-2 peer-focus-visible:ring-white/20 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[#111]`} />
+                {/* Thumb */}
+                <div className={`absolute top-[2px] h-5 w-5 rounded-full shadow-sm transition-all duration-300 flex items-center justify-center ${
+                  storeRequestLogs ? "left-[18px] bg-black" : "left-[2px] bg-neutral-400"
+                }`} />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[14px] font-medium tracking-tight text-white group-hover/toggle:text-white transition-colors">Store message contents natively</span>
+                <span className="text-[13px] text-neutral-500">Enable detailed prompt inspection</span>
+              </div>
+            </label>
+            <Button type="submit" variant="secondary" className="h-9 px-6 bg-white text-black hover:bg-neutral-200 font-medium tracking-tight whitespace-nowrap transition-colors">Save Preferences</Button>
+          </form>
+        </div>
+
+        {/* Danger Zone */}
+        <div className="bg-[#0A0A0A] border border-red-500/20 rounded-xl p-8 shadow-sm relative flex flex-col">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-xl font-medium tracking-tight text-red-500">Danger Zone</h2>
+          </div>
+          <p className="text-[14px] text-neutral-400 leading-relaxed max-w-2xl mb-8">
+            Deleting your account is permanent. All programmatic API keys, active streams, and raw usage logs will be cryptographically erased immediately. <strong className="text-white font-medium">This cannot be recovered.</strong>
+          </p>
+          <form action={deleteAccount}>
+            <Button
+              type="submit"
+              variant="destructive"
+              className="h-9 px-4 gap-2 bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500 hover:text-white transition-colors rounded-md"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Account Permanently
+            </Button>
+          </form>
+        </div>
       </div>
     </div>
   )

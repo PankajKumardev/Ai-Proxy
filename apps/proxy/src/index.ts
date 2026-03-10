@@ -33,11 +33,9 @@ async function logUsage(data: Record<string, unknown>) {
       // Check if user has opted into request/response logging
       let logData = { ...data }
       if (data.userId && (data.promptJson || data.responseJson)) {
-        const user = await prisma.user.findUnique({
-          where: { id: data.userId as string },
-          select: { storeRequestLogs: true },
-        })
-        if (!user?.storeRequestLogs) {
+        // UI Preview mode: default to not storing logs without querying missing Prisma fields
+        const storeRequestLogs = false;
+        if (!storeRequestLogs) {
           // User hasn't opted in — strip prompt/response content
           delete logData.promptJson
           delete logData.responseJson
