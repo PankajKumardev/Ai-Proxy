@@ -36,7 +36,13 @@ AI Gateway solves all three instantly through a single unified endpoint.
 
 ## System Architecture
 
-The gateway operates on a high-throughput, horizontally scalable stateless architecture.
+The gateway operates on a high-throughput, horizontally scalable stateless architecture. The diagram below shows the complete request lifecycle — from client to LLM provider — including all middleware layers, caching, fallback routing, data stores, and the analytics dashboard.
+
+![AI Gateway — Full System Architecture](./SYSTEM_DESIGN.png)
+
+> **Full system design** showing the complete middleware pipeline (① CORS → ② Request ID → ③ Body Limit → ④ Auth → ⑤ Quota → ⑥ Rate Limit → ⑦ SHA-256 Cache → ⑧ Smart Router → ⑨ Stream Multiplexer → ⑩ Async Logger), provider health tracking, fallback routing strategy matrix, Upstash Redis and Neon PostgreSQL data stores, and the Next.js analytics dashboard.
+
+### Request Flow Overview
 
 ```mermaid
 graph TD
