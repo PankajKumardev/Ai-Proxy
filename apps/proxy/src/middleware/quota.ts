@@ -5,11 +5,9 @@ import { Redis } from "@upstash/redis"
 
 const redis = Redis.fromEnv()
 
-function secondsUntilNextMonthUTC(): number {
+function secondsUntilMonthEnd(): number {
   const now = new Date()
-  const nextMonth = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)
-  )
+  const nextMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1))
   return Math.floor((nextMonth.getTime() - now.getTime()) / 1000)
 }
 
@@ -28,9 +26,9 @@ export async function quotaMiddleware(c: Context, next: Next) {
     const used = await redis.incr(quotaKey)
 
     if (used === 1) {
-      // First request this month — set expiry to end of month
-      await redis.expireat(quotaKey, secondsUntilNextMonthUTC())
-    }
+        // expire() takes TTL in seconds — correct API
+        await redis.expire(quotaKey, secondsUntilMonthEnd())
+      }
 
     if (used > FREE_LIMIT) {
       return c.json(
@@ -49,7 +47,7 @@ export async function quotaMiddleware(c: Context, next: Next) {
     const used = await redis.incr(quotaKey)
 
     if (used === 1) {
-      await redis.expireat(quotaKey, secondsUntilNextMonthUTC())
+      await redis.expire(quotaKey, secondsUntilMonthEnd())
     }
 
     if (used > PRO_LIMIT) {

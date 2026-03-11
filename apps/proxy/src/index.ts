@@ -14,6 +14,7 @@ import { quotaMiddleware } from "./middleware/quota"
 import { rateLimitMiddleware } from "./middleware/rate-limit"
 import { cacheMiddleware } from "./middleware/cache"
 import { router, routerStream } from "./router"
+import { prisma } from "./lib/prisma"
 
 // Type the context variables so c.set/c.get are not 'never'
 type AppVariables = {
@@ -25,45 +26,53 @@ type AppVariables = {
 // Fire-and-forget logger (write to prisma after response)
 const redis = Redis.fromEnv()
 
-async function logUsage(data: Record<string, unknown>) {
-  const { PrismaClient } = await import("@prisma/client")
-  const prisma = new PrismaClient()
+interface LogUsageData {
+  requestId: string
+  userId: string
+  provider: string
+  model: string
+  tokens: number
+  cost: number
+  cacheHit: boolean
+  cacheType: string   // "exact" | "semantic" | "miss" | "skip"
+  latencyMs: number
+  promptJson?: string
+  responseJson?: string
+}
+
+function logUsage(data: LogUsageData): void {
   setImmediate(async () => {
     try {
-      // Check if user has opted into request/response logging
-      let logData = { ...data }
-      if (data.userId && (data.promptJson || data.responseJson)) {
-        // UI Preview mode: default to not storing logs without querying missing Prisma fields
-        const storeRequestLogs = false;
-        if (!storeRequestLogs) {
-          // User hasn't opted in — strip prompt/response content
+      let logData: LogUsageData = { ...data }
+
+      // Respect user's opt-in preference for storing prompt/response content
+      if (data.promptJson || data.responseJson) {
+        const user = await prisma.user.findUnique({
+          where: { id: data.userId },
+          select: { storeRequestLogs: true },
+        })
+        if (!user?.storeRequestLogs) {
           delete logData.promptJson
           delete logData.responseJson
         }
       }
 
-      await prisma.usageLog.create({
-        data: logData as Parameters<typeof prisma.usageLog.create>[0]["data"],
-      })
+      await prisma.usageLog.create({ data: logData })
 
-      // Log retention: cap at 1,000 logs per user (fire-and-forget trim)
-      if (data.userId) {
-        const oldLogs = await prisma.usageLog.findMany({
-          where: { userId: data.userId as string },
-          orderBy: { timestamp: "desc" },
-          skip: 1000,
-          select: { id: true },
+      // Log retention: cap at 1,000 logs per user
+      const oldLogs = await prisma.usageLog.findMany({
+        where: { userId: data.userId },
+        orderBy: { timestamp: "desc" },
+        skip: 1000,
+        select: { id: true },
+      })
+      if (oldLogs.length > 0) {
+        await prisma.usageLog.deleteMany({
+          where: { id: { in: oldLogs.map((l) => l.id) } },
         })
-        if (oldLogs.length > 0) {
-          await prisma.usageLog.deleteMany({
-            where: { id: { in: oldLogs.map((l) => l.id) } },
-          })
-        }
       }
     } catch (err: unknown) {
       console.error("[logger] DB write failed:", (err as Error).message)
-    } finally {
-      await prisma.$disconnect()
     }
   })
 }
@@ -167,7 +176,7 @@ app.post(
         const latencyMs = Date.now() - startTime
 
         // Fire-and-forget log (tokens unknown at stream-start — logged as 0)
-        setImmediate(() => logUsage({
+        logUsage({
           requestId,
           userId: user.userId,
           provider,
@@ -175,8 +184,9 @@ app.post(
           tokens: 0,         // unknown at stream-start; logged as 0
           cost: 0,
           cacheHit: false,
+          cacheType: "miss", // streaming always bypasses cache
           latencyMs,
-        }))
+        })
 
         // Pipe the raw provider SSE body directly to the client — real chunk passthrough
         const providerBody = providerResponse.body
@@ -223,7 +233,7 @@ app.post(
         setImmediate(() => redis.incr("metrics:cache_misses"))
 
         // Fire-and-forget DB log
-        setImmediate(() => logUsage({
+        logUsage({
           requestId,
           userId: user.userId,
           provider,
@@ -231,8 +241,9 @@ app.post(
           tokens,
           cost,
           cacheHit: false,
+          cacheType: "miss",
           latencyMs,
-        }))
+        })
 
         return {
           request_id: requestId,

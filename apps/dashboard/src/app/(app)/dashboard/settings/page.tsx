@@ -1,30 +1,31 @@
 import { auth } from "@/auth"
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "@/lib/prisma"
 import { redirect } from "next/navigation"
-import bcrypt from "bcryptjs"
 import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { CheckCircle2, XCircle, ShieldAlert, Lock, Mail, ScanEye, Trash2 } from "lucide-react"
+import { CheckCircle2, XCircle, Trash2 } from "lucide-react"
+import { updateEmail, updatePassword, updateLogging, deleteAccount } from "./actions"
 
 export const metadata: Metadata = { title: "Settings — AI Gateway Dashboard" }
 
-// ── SERVER ACTIONS (no-ops for UI preview) ────────────────────────────────
-async function updateEmail() { "use server" }
-async function updatePassword() { "use server" }
-async function updateLogging() { "use server" }
-async function deleteAccount() { "use server" }
-// ─────────────────────────────────────────────────────────────────────────
 
 export default async function SettingsPage({
   searchParams,
 }: {
   searchParams: Promise<{ success?: string; error?: string }>
 }) {
+  const session = await auth()
+  if (!session?.user?.id) redirect("/login")
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { email: true, storeRequestLogs: true },
+  })
+  if (!user) redirect("/login")
+
   const resolvedParams = await searchParams
-  // DUMMY DATA FOR UI PREVIEW
-  const storeRequestLogs = false
-  const dummyEmail = "demo@aigateway.dev"
+  const { email: currentEmail, storeRequestLogs } = user
 
 
 
@@ -74,7 +75,7 @@ export default async function SettingsPage({
             <div className="space-y-2">
               <label className="text-[11px] font-medium text-neutral-400 uppercase tracking-widest">Current email</label>
               <div className="flex h-10 w-full rounded-md border border-white/10 bg-[#000000] px-3 items-center text-[14px] text-neutral-500 cursor-not-allowed">
-                {dummyEmail}
+                {currentEmail}
               </div>
             </div>
             <div className="space-y-2">

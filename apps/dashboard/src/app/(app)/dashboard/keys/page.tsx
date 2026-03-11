@@ -1,34 +1,35 @@
 import { PrismaClient } from "@prisma/client"
-import { revalidatePath } from "next/cache"
-import crypto from "crypto"
-
+import { auth } from "@/auth"
+import { redirect } from "next/navigation"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { PlusCircle, KeyRound, TerminalSquare, AlertCircle, Trash2, Key } from "lucide-react"
+import { Trash2, Key } from "lucide-react"
 import { CreateKeyDialog } from "@/components/create-key-dialog"
 import { CopyButton } from "@/components/copy-button"
+import { createKey, deleteKey } from "./actions"
 
 export const metadata = { title: "API Keys — AI Gateway Dashboard" }
 
-async function createKey() { "use server" }
-async function deleteKey(formData: FormData) { "use server" }
+const prisma = new PrismaClient()
+
 
 export default async function KeysPage({
   searchParams,
 }: {
   searchParams: Promise<{ new?: string }>
 }) {
+  const session = await auth()
+  if (!session?.user?.id) redirect("/login")
+
   const resolvedParams = await searchParams
   const newKey = resolvedParams.new
 
-  // Dummy keys for UI preview
-  const keys = [
-    { id: "k1", name: "Production Key",    keyHash: "a3f9d2e1b8c74f6521d0e9a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3", createdAt: new Date("2025-02-01") },
-    { id: "k2", name: "Development Key",   keyHash: "b4a0d3f2c9d85071e2c1f0a4b5d6e7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4", createdAt: new Date("2025-02-15") },
-    { id: "k3", name: "CI/CD Pipeline",    keyHash: "c5b1e4d3a0e96182f3d2a1b5c6e7f8b9c0a1d2e3f4a5b6c7d8e9f0a1b2c3d4e5", createdAt: new Date("2025-03-01") },
-  ]
+  const keys = await prisma.apiKey.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "desc" },
+  })
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

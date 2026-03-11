@@ -42,6 +42,7 @@ model UsageLog {
   tokens       Int
   cost         Float
   cacheHit     Boolean
+  cacheType    String   @default("miss") // "exact" | "semantic" | "miss" | "skip"
   latencyMs    Int // total request duration
   promptJson   String? // JSON string of messages array — nullable, opt-in
   responseJson String? // JSON string of response choices — nullable

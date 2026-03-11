@@ -1,8 +1,8 @@
 # AI Gateway
 
-Open-source LLM proxy with response caching, automated fallback routing, and real-time usage analytics.
+Open-source LLM proxy with **semantic response caching**, automated fallback routing, and real-time usage analytics.
 
-AI Gateway acts as an invisible interception layer between your application and Large Language Model providers (OpenAI, Gemini, Anthropic). By caching identical prompt responses and intelligently routing requests when rate limits are hit, it dramatically reduces API costs and ensures absolute uptime, all without requiring any architectural changes to your existing codebase.
+AI Gateway acts as an invisible interception layer between your application and Large Language Model providers (OpenAI, Gemini, Anthropic). By caching semantically similar prompt responses (not just exact matches) and intelligently routing requests when rate limits are hit, it dramatically reduces API costs and ensures absolute uptime — all without requiring any architectural changes to your existing codebase.
 
 ---
 
@@ -26,7 +26,7 @@ AI Gateway solves all three instantly through a single unified endpoint.
 
 ## Core Features
 
-- **Response Caching (SHA-256 Exact Match):** Stops upstream calls for identical payloads. Can reduce API costs by up to 40% for repetitive queries. Cache hits process in under 10ms.
+- **Hybrid Response Caching (Exact + Semantic):** Two-layer caching pipeline. First, an exact SHA-256 fingerprint match (< 1ms — zero LLM call). Second, if no exact match, a semantic vector similarity search via Upstash Vector (< 20ms) — so paraphrased prompts like "What is 2+2?" and "2+2 =?" both hit the cache. Eliminates redundant API calls and dramatically cuts costs even for conversational workloads.
 - **Automated Fallback Routing:** If your primary provider (e.g., OpenAI) responds with a 429 Rate Limit or 500 Server Error, the proxy seamlessly reroutes the exact payload to a configured secondary provider (e.g., Gemini or Anthropic Claude) completely invisibly to your client.
 - **Smart Routing Strategies:** Inject headers to dynamically route traffic per-request based on strategy (`cheap`, `balanced`, `quality`).
 - **Analytics & Cost Dashboard:** Real-time visibility into token usage, cost breakdowns per provider, and cache-hit ratios.

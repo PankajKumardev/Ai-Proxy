@@ -3,10 +3,9 @@
 import type { Context, Next } from "hono"
 import { createHash } from "crypto"
 import { Redis } from "@upstash/redis"
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "../lib/prisma"
 
 const redis = Redis.fromEnv()
-const prisma = new PrismaClient()
 
 interface CachedApiKey {
   userId: string
