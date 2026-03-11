@@ -8,6 +8,7 @@ import { CheckCircle2, XCircle, Trash2 } from "lucide-react"
 import { updateEmail, updatePassword, updateLogging, deleteAccount } from "./actions"
 
 export const metadata: Metadata = { title: "Settings — AI Gateway Dashboard" }
+export const dynamic = "force-dynamic"  // auth() reads cookies — can't prerender
 
 
 export default async function SettingsPage({

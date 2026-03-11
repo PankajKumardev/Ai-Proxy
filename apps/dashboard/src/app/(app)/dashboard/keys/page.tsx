@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import { prisma } from "@/lib/prisma"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
@@ -10,9 +10,9 @@ import { CreateKeyDialog } from "@/components/create-key-dialog"
 import { CopyButton } from "@/components/copy-button"
 import { createKey, deleteKey } from "./actions"
 
+export const dynamic = "force-dynamic"   // auth() reads cookies — can't prerender
 export const metadata = { title: "API Keys — AI Gateway Dashboard" }
 
-const prisma = new PrismaClient()
 
 
 export default async function KeysPage({

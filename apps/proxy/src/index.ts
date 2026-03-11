@@ -127,8 +127,15 @@ app.get("/health", (c) =>
   })
 )
 
-// --- Metrics endpoint ---
+// --- Metrics endpoint (protected by METRICS_SECRET) ---
 app.get("/metrics", async (c) => {
+  const secret = process.env.METRICS_SECRET
+  if (secret) {
+    const auth = c.req.header("Authorization")
+    if (auth !== `Bearer ${secret}`) {
+      return c.json({ error: { type: "auth_error", message: "Unauthorized" } }, 401)
+    }
+  }
   const [totalReqs, cacheHits, cacheMisses, providerFailures] = await Promise.all([
     redis.get("metrics:total_requests").then((v) => Number(v ?? 0)),
     redis.get("metrics:cache_hits").then((v) => Number(v ?? 0)),
