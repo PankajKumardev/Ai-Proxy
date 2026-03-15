@@ -4,7 +4,7 @@ Open-source LLM proxy with **semantic response caching**, automated fallback rou
 
 AI Gateway acts as an invisible interception layer between your application and Large Language Model providers (OpenAI, Gemini, Anthropic). By caching semantically similar prompt responses (not just exact matches) and intelligently routing requests when rate limits are hit, it dramatically reduces API costs and ensures absolute uptime — all without requiring any architectural changes to your existing codebase.
 
----
+
 
 ## Open Source & Self-Hostable
 
