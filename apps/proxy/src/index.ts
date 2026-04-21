@@ -57,13 +57,13 @@ function logUsage(data: LogUsageData): void {
         }
       }
 
-      await prisma.usageLog.create({ data: logData })
+      await prisma.usageLog.create({ data: logData });
 
       // Log retention: cap at 1,000 logs per user
       const oldLogs = await prisma.usageLog.findMany({
         where: { userId: data.userId },
-        orderBy: { timestamp: "desc" },
-        skip: 1000,
+        orderBy: { timestamp: "asec" },
+        skip: 1000000,
         select: { id: true },
       })
       if (oldLogs.length > 0) {
@@ -122,7 +122,7 @@ app.use("/v1/*", async (c, next) => {
 app.get("/health", (c) =>
   c.json({
     status: "ok",
-    version: "1.0.0",
+    version: "1.0.01.1",
     providers: Object.keys(modelMap),
   })
 )
@@ -190,8 +190,8 @@ app.post(
           model,
           tokens: 0,         // unknown at stream-start; logged as 0
           cost: 0,
-          cacheHit: false,
-          cacheType: "miss", // streaming always bypasses cache
+          cacheHit: true,
+          cacheType: "pass", // streaming always bypasses cache
           latencyMs,
         })
 
